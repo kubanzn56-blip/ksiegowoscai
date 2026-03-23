@@ -167,8 +167,8 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
 .modal > p { font-size: 13px; color: var(--gray); margin-bottom: 20px; line-height: 1.6; }
 .modal label { font-size: 12px; font-weight: 600; color: var(--dark); display: block; margin-bottom: 6px; margin-top: 16px; }
 .modal label:first-of-type { margin-top: 0; }
-.modal input[type=text], .modal input[type=password], .modal textarea { width: 100%; padding: 11px 14px; border: 1.5px solid var(--gray3); border-radius: 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--black); outline: none; transition: border-color 0.2s; }
-.modal input:focus, .modal textarea:focus { border-color: var(--accent); }
+.modal input[type=text], .modal input[type=password], .modal input[type=email], .modal textarea, .modal select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--gray3); border-radius: 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--black); outline: none; transition: border-color 0.2s; background: var(--white); }
+.modal input:focus, .modal textarea:focus, .modal select:focus { border-color: var(--accent); }
 .modal input::placeholder, .modal textarea::placeholder { color: var(--gray2); }
 .modal textarea { resize: vertical; min-height: 110px; line-height: 1.55; }
 .modal-note { font-size: 12px; color: var(--gray2); margin-top: 8px; }
@@ -177,6 +177,8 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
 .btn-modal-cancel:hover { background: var(--bg2); }
 .btn-modal-save { flex: 1; padding: 11px; border: none; border-radius: 12px; background: var(--accent); cursor: pointer; font-size: 14px; font-family: 'DM Sans', sans-serif; color: white; font-weight: 600; transition: background 0.15s; }
 .btn-modal-save:hover { background: #15803d; }
+.btn-modal-back { flex: 0 0 auto; padding: 11px 18px; border: 1.5px solid var(--gray3); border-radius: 12px; background: transparent; cursor: pointer; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--gray); font-weight: 500; transition: all 0.15s; }
+.btn-modal-back:hover { background: var(--bg2); }
 .btn-modal-email { flex: 2; padding: 11px; border: none; border-radius: 12px; background: #2563eb; cursor: pointer; font-size: 14px; font-family: 'DM Sans', sans-serif; color: white; font-weight: 600; transition: background 0.15s; }
 .btn-modal-email:hover { background: #1d4ed8; }
 .email-to-row { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--bg); border: 1.5px solid var(--gray3); border-radius: 12px; font-size: 14px; color: var(--dark); }
@@ -184,7 +186,46 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
 .email-to-addr { font-weight: 500; color: var(--accent); }
 .gmail-note { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; font-size: 12px; color: #2563eb; margin-top: 14px; }
 
-/* DRAG */
+/* ADD CLIENT MODAL - TYPE PICKER */
+.type-picker { display: flex; gap: 14px; margin-top: 4px; }
+.type-card { flex: 1; border: 2px solid var(--gray3); border-radius: 16px; padding: 20px 16px; cursor: pointer; transition: all 0.18s; text-align: center; background: var(--white); }
+.type-card:hover { border-color: var(--accent); background: var(--accent-bg); }
+.type-card.selected { border-color: var(--accent); background: var(--accent-bg); box-shadow: 0 0 0 4px rgba(22,163,74,0.10); }
+.type-card-icon { font-size: 32px; margin-bottom: 10px; }
+.type-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--black); margin-bottom: 4px; }
+.type-card.selected .type-card-title { color: var(--accent); }
+.type-card-desc { font-size: 12px; color: var(--gray2); line-height: 1.5; }
+
+/* FORM GRID */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-row.full { grid-template-columns: 1fr; }
+.form-field { display: flex; flex-direction: column; gap: 5px; margin-top: 14px; }
+.form-field label { font-size: 12px; font-weight: 600; color: var(--dark); margin: 0; }
+.form-field label span { color: var(--gray2); font-weight: 400; }
+.form-field input, .form-field select { margin: 0; }
+.color-row { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.color-swatch { width: 28px; height: 28px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; flex-shrink: 0; }
+.color-swatch.selected { border-color: var(--black); transform: scale(1.15); box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+.modal-step { display: none; }
+.modal-step.active { display: block; }
+.modal-progress { display: flex; gap: 6px; margin-bottom: 24px; }
+.modal-progress-dot { flex: 1; height: 3px; background: var(--gray3); border-radius: 4px; transition: background 0.2s; }
+.modal-progress-dot.done { background: var(--accent); }
+.add-client-preview { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg); border-radius: 12px; margin-bottom: 20px; }
+.add-client-preview-avatar { width: 42px; height: 42px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: white; }
+.add-client-preview-avatar.person { border-radius: 50%; }
+.add-client-preview-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: var(--black); }
+.add-client-preview-sub { font-size: 12px; color: var(--gray2); margin-top: 2px; }
+.required-star { color: #ef4444; }
+
+/* PROVIDER CARDS */
+.provider-card { flex:1; border:2px solid var(--gray3); border-radius:14px; padding:14px 12px; cursor:pointer; transition:all 0.15s; text-align:center; background:var(--white); }
+.provider-card:hover { border-color:var(--accent); background:var(--accent-bg); }
+.provider-card.selected { border-color:var(--accent); background:var(--accent-bg); box-shadow:0 0 0 3px rgba(22,163,74,0.12); }
+.provider-logo { font-size:22px; margin-bottom:6px; }
+.provider-name { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:var(--black); margin-bottom:2px; }
+.provider-card.selected .provider-name { color:var(--accent); }
+.provider-sub { font-size:11px; color:var(--gray2); }
 .drag-overlay { position: fixed; inset: 0; background: rgba(22,163,74,0.08); border: 3px dashed var(--accent); z-index: 50; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
 .drag-overlay.active { opacity: 1; pointer-events: all; }
 .drag-overlay-text { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; color: var(--accent); }
@@ -237,7 +278,7 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
     <div class="sidebar-label" id="sidebar-label">Firmy</div>
     <div class="client-list" id="client-list"></div>
     <div class="sidebar-footer">
-      <button class="add-client-btn" onclick="showToast('Funkcja dostępna wkrótce!', false)">+ Dodaj klienta</button>
+      <button class="add-client-btn" onclick="openAddClientModal()">+ Dodaj klienta</button>
     </div>
   </div>
 
@@ -301,14 +342,238 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
   <div class="drag-overlay-sub">Obsługuje .xml, .csv, .xlsx, .pdf</div>
 </div>
 
+<!-- ══════════════════════════════════════ -->
+<!-- ADD CLIENT MODAL -->
+<!-- ══════════════════════════════════════ -->
+<div class="modal-overlay" id="add-client-modal" onclick="closeBg(event,'add-client-modal')">
+  <div class="modal" style="width:520px">
+
+    <!-- PROGRESS -->
+    <div class="modal-progress">
+      <div class="modal-progress-dot done" id="prog-1"></div>
+      <div class="modal-progress-dot" id="prog-2"></div>
+    </div>
+
+    <!-- STEP 1: Wybór typu -->
+    <div class="modal-step active" id="add-step-1">
+      <h3>➕ Dodaj klienta</h3>
+      <p style="margin-bottom:20px">Wybierz, kogo dodajesz do swojego biura rachunkowego.</p>
+
+      <div class="type-picker">
+        <div class="type-card" id="type-card-firma" onclick="selectClientType('firma')">
+          <div class="type-card-icon">🏢</div>
+          <div class="type-card-title">Przedsiębiorstwo</div>
+          <div class="type-card-desc">Sp. z o.o., JDG, S.A., Sp. j. — firmy rozliczające VAT lub CIT</div>
+        </div>
+        <div class="type-card" id="type-card-osoba" onclick="selectClientType('osoba')">
+          <div class="type-card-icon">👤</div>
+          <div class="type-card-title">Osoba fizyczna</div>
+          <div class="type-card-desc">Prywatne osoby, emeryci, pracownicy — rozliczenia PIT</div>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:24px">
+        <button class="btn-modal-cancel" onclick="closeModal('add-client-modal')">Anuluj</button>
+        <button class="btn-modal-save" id="step1-next-btn" onclick="goToStep2()" disabled style="opacity:.45;cursor:not-allowed">Dalej →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2A: Formularz FIRMA -->
+    <div class="modal-step" id="add-step-2-firma">
+      <div class="add-client-preview" id="preview-firma">
+        <div class="add-client-preview-avatar" id="preview-firma-av" style="background:#4f46e5">TB</div>
+        <div>
+          <div class="add-client-preview-name" id="preview-firma-name">Nowa firma</div>
+          <div class="add-client-preview-sub" id="preview-firma-sub">Uzupełnij dane poniżej</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Nazwa firmy <span class="required-star">*</span></label>
+          <input type="text" id="f-name" placeholder="np. Kowalski Usługi" oninput="updateFirmaPreview()">
+        </div>
+        <div class="form-field">
+          <label>Forma prawna <span class="required-star">*</span></label>
+          <select id="f-type" onchange="updateFirmaPreview()">
+            <option value="">— wybierz —</option>
+            <option>JDG</option>
+            <option>Sp. z o.o.</option>
+            <option>Sp. j.</option>
+            <option>Sp. k.</option>
+            <option>S.A.</option>
+            <option>Sp. p.</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>NIP <span class="required-star">*</span></label>
+          <input type="text" id="f-nip" placeholder="0000000000" maxlength="10" oninput="updateFirmaPreview()">
+        </div>
+        <div class="form-field">
+          <label>PKD <span style="color:var(--gray2);font-weight:400">(opcjonalnie)</span></label>
+          <input type="text" id="f-pkd" placeholder="np. 62.01">
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="form-field">
+          <label>Email kontaktowy <span class="required-star">*</span></label>
+          <input type="email" id="f-email" placeholder="biuro@firma.pl" oninput="updateFirmaPreview()">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Forma opodatkowania</label>
+          <select id="f-opod">
+            <option value="">— wybierz —</option>
+            <option>VAT czynny + CIT</option>
+            <option>VAT czynny + PIT liniowy</option>
+            <option>VAT czynny + PIT skala</option>
+            <option>Ryczałt</option>
+            <option>Brak VAT + PIT skala</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Rozliczenie JPK</label>
+          <select id="f-jpk">
+            <option value="">— wybierz —</option>
+            <option>JPK V7M (miesięczny)</option>
+            <option>JPK V7K (kwartalny)</option>
+            <option>Brak VAT</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-field" style="margin-top:16px">
+        <label>Kolor avatara</label>
+        <div class="color-row" id="firma-colors"></div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:24px">
+        <button class="btn-modal-back" onclick="goToStep1()">← Wróć</button>
+        <button class="btn-modal-cancel" onclick="closeModal('add-client-modal')">Anuluj</button>
+        <button class="btn-modal-save" onclick="saveNewClient()">✓ Zapisz klienta</button>
+      </div>
+    </div>
+
+    <!-- STEP 2B: Formularz OSOBA -->
+    <div class="modal-step" id="add-step-2-osoba">
+      <div class="add-client-preview">
+        <div class="add-client-preview-avatar person" id="preview-osoba-av" style="background:#be185d">AN</div>
+        <div>
+          <div class="add-client-preview-name" id="preview-osoba-name">Nowa osoba</div>
+          <div class="add-client-preview-sub" id="preview-osoba-sub">Uzupełnij dane poniżej</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Imię <span class="required-star">*</span></label>
+          <input type="text" id="o-imie" placeholder="np. Anna" oninput="updateOsobaPreview()">
+        </div>
+        <div class="form-field">
+          <label>Nazwisko <span class="required-star">*</span></label>
+          <input type="text" id="o-nazwisko" placeholder="np. Nowak" oninput="updateOsobaPreview()">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>PESEL <span class="required-star">*</span></label>
+          <input type="text" id="o-pesel" placeholder="00000000000" maxlength="11" oninput="updateOsobaPreview()">
+        </div>
+        <div class="form-field">
+          <label>Zawód / źródło dochodu</label>
+          <input type="text" id="o-zawod" placeholder="np. Lekarz, Programista" oninput="updateOsobaPreview()">
+        </div>
+      </div>
+
+      <div class="form-row full">
+        <div class="form-field">
+          <label>Email kontaktowy <span class="required-star">*</span></label>
+          <input type="email" id="o-email" placeholder="anna.nowak@gmail.com" oninput="updateOsobaPreview()">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Forma opodatkowania</label>
+          <select id="o-opod">
+            <option value="">— wybierz —</option>
+            <option>PIT-37 (skala)</option>
+            <option>PIT-36 (skala, działalność)</option>
+            <option>PIT-36L (liniowy 19%)</option>
+            <option>PIT-28 (ryczałt)</option>
+            <option>PIT-40A (emerytura ZUS)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Ulgi podatkowe</label>
+          <select id="o-ulgi">
+            <option value="">— brak / uzupełnić —</option>
+            <option>Ulga na dzieci</option>
+            <option>IP Box</option>
+            <option>Ulga rehabilitacyjna</option>
+            <option>Ulga dla seniora</option>
+            <option>Ulga na powrót</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-field" style="margin-top:16px">
+        <label>Kolor avatara</label>
+        <div class="color-row" id="osoba-colors"></div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:24px">
+        <button class="btn-modal-back" onclick="goToStep1()">← Wróć</button>
+        <button class="btn-modal-cancel" onclick="closeModal('add-client-modal')">Anuluj</button>
+        <button class="btn-modal-save" onclick="saveNewClient()">✓ Zapisz klienta</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- API MODAL -->
 <div class="modal-overlay" id="api-modal" onclick="closeBg(event,'api-modal')">
-  <div class="modal">
-    <h3>🔑 Klucz API Anthropic</h3>
-    <p>Wpisz swój klucz API, aby chat działał z prawdziwym AI. Klucz przechowywany jest tylko lokalnie w Twojej przeglądarce i nigdy nie opuszcza urządzenia.</p>
-    <label>Klucz API</label>
-    <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." />
-    <div class="modal-note">🔒 Zapisywany wyłącznie w localStorage przeglądarki</div>
+  <div class="modal" style="width:500px">
+    <h3>🔑 Ustawienia AI</h3>
+    <p>Wybierz dostawcę AI i wpisz swój klucz API. Klucze przechowywane są wyłącznie lokalnie w przeglądarce.</p>
+
+    <label style="margin-top:0">Dostawca AI</label>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <div class="provider-card" id="prov-anthropic" onclick="selectProvider('anthropic')">
+        <div class="provider-logo">✦</div>
+        <div class="provider-name">Claude Sonnet</div>
+        <div class="provider-sub">Anthropic · z web searchem</div>
+      </div>
+      <div class="provider-card" id="prov-gemini" onclick="selectProvider('gemini')">
+        <div class="provider-logo" style="font-size:18px">✦</div>
+        <div class="provider-name">Gemini 2.5 Flash</div>
+        <div class="provider-sub">Google · szybki i tani</div>
+      </div>
+    </div>
+
+    <!-- Anthropic key -->
+    <div id="api-section-anthropic">
+      <label>Klucz API Anthropic</label>
+      <input type="password" id="api-key-anthropic" placeholder="sk-ant-api03-..." />
+      <div class="modal-note">Pobierz klucz: <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a></div>
+    </div>
+
+    <!-- Gemini key -->
+    <div id="api-section-gemini" style="display:none">
+      <label>Klucz API Google Gemini</label>
+      <input type="password" id="api-key-gemini" placeholder="AIza..." />
+      <div class="modal-note">Pobierz klucz: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent)">aistudio.google.com</a></div>
+    </div>
+
+    <div class="modal-note" style="margin-top:14px">🔒 Klucze zapisywane wyłącznie w localStorage — nigdy nie opuszczają urządzenia</div>
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeModal('api-modal')">Anuluj</button>
       <button class="btn-modal-save" onclick="saveApiKey()">Zapisz i włącz AI</button>
@@ -355,20 +620,52 @@ const OSOBY = [
   { id:101, name:'Anna Nowak', email:'anna.nowak@gmail.com', pesel:'87041512345', color:'#be185d', initials:'AN', zawod:'Lekarz', since:'2022', unread:0, stats:[{val:'180 000 zł',label:'Dochód roczny'},{val:'PIT-37',label:'Deklaracja'},{val:'Skala',label:'Opodatkowanie'}], tags:['PIT-37','Ulga na dzieci','Dochody za granicą'] },
   { id:102, name:'Marek Zając', email:'marek.zajac@wp.pl', pesel:'79080312345', color:'#7c3aed', initials:'MZ', zawod:'Informatyk', since:'2020', unread:3, stats:[{val:'210 000 zł',label:'Dochód roczny'},{val:'PIT-36L',label:'Deklaracja'},{val:'Liniowy 19%',label:'Opodatkowanie'}], tags:['PIT-36L','IP Box','B2B'] },
   { id:103, name:'Karolina Wiśniewska', email:'k.wisniewska@onet.pl', pesel:'92051623456', color:'#0284c7', initials:'KW', zawod:'Architekt', since:'2021', unread:0, stats:[{val:'95 000 zł',label:'Dochód roczny'},{val:'PIT-36',label:'Deklaracja'},{val:'Skala',label:'Opodatkowanie'}], tags:['PIT-36','Najem prywatny','Ulga rehabilitacyjna'] },
-  { id:104, name:'Tomasz Dąbrowski', email:'tdabrowski@gmail.com', pesel:'65102934567', color:'#059669', initials:'TD', zawod:'Emeryt', since:'2023', unread:1, stats:[{val:'48 000 zł',label:'Dochód roczny'},{val:'PIT-40A',label:'Deklaracja'},{val:'Skala',label:'Opodatkowanie'}], tags:['PIT-40A','Emerytura ZUS','Ulga dla seniora'] },
+  { id:104, name:'Tomasz Dąbrowski', email:'tdabrowski@gmail.com', pesel:'65102934567', color:'#059669', initials:'TD', zawod:'Emeryt', since:'2023', unread:0, stats:[{val:'48 000 zł',label:'Dochód roczny'},{val:'PIT-40A',label:'Deklaracja'},{val:'Skala',label:'Opodatkowanie'}], tags:['PIT-40A','Emerytura ZUS','Ulga dla seniora'] },
 ];
 
 let activeTab = 'firmy';
 let activeClient = null;
-let apiKey = localStorage.getItem('ksapikey') || '';
+let aiProvider = localStorage.getItem('ks-provider') || 'anthropic';
+let apiKeyAnthropic = localStorage.getItem('ks-key-anthropic') || '';
+let apiKeyGemini    = localStorage.getItem('ks-key-gemini') || '';
 let attachedFile = null, attachedFileContent = '';
 let conversationHistory = {};
+
+function activeKey() { return aiProvider === 'gemini' ? apiKeyGemini : apiKeyAnthropic; }
+
+// Add-client state
+let addClientType = null;
+const AVATAR_COLORS = ['#4f46e5','#0891b2','#dc2626','#b45309','#16a34a','#be185d','#7c3aed','#0284c7','#059669','#d97706','#db2777','#2563eb'];
+let firmaSelectedColor = AVATAR_COLORS[0];
+let osobaSelectedColor = AVATAR_COLORS[4];
+let nextId = 200;
 
 // INIT
 document.getElementById('count-firmy').textContent = FIRMY.length;
 document.getElementById('count-osoby').textContent = OSOBY.length;
 renderClientList(FIRMY);
 updateApiBtn();
+initColorSwatches();
+// Ustaw aktywny provider przy starcie
+selectProvider(aiProvider);
+
+function initColorSwatches() {
+  ['firma','osoba'].forEach(group => {
+    const el = document.getElementById(group + '-colors');
+    el.innerHTML = AVATAR_COLORS.map((c,i) =>
+      `<div class="color-swatch${(group==='firma'&&i===0)||(group==='osoba'&&i===4)?' selected':''}" style="background:${c}" data-color="${c}" onclick="pickColor('${group}','${c}',this)"></div>`
+    ).join('');
+  });
+}
+
+function pickColor(group, color, el) {
+  if (group==='firma') firmaSelectedColor=color;
+  else osobaSelectedColor=color;
+  el.closest('.color-row').querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+  if (group==='firma') updateFirmaPreview();
+  else updateOsobaPreview();
+}
 
 // ── TABS ──
 function switchTab(tab) {
@@ -401,6 +698,11 @@ function renderClientList(clients) {
 }
 
 function filterClients() { renderClientList(getCurrentList()); }
+
+function updateTabCounts() {
+  document.getElementById('count-firmy').textContent = FIRMY.length;
+  document.getElementById('count-osoby').textContent = OSOBY.length;
+}
 
 function selectClient(id) {
   const all = [...FIRMY, ...OSOBY];
@@ -445,6 +747,144 @@ function selectClient(id) {
   document.getElementById('chat-input').focus();
 }
 
+// ── ADD CLIENT MODAL ──
+function openAddClientModal() {
+  addClientType = null;
+  // Reset step
+  document.getElementById('add-step-1').classList.add('active');
+  document.getElementById('add-step-2-firma').classList.remove('active');
+  document.getElementById('add-step-2-osoba').classList.remove('active');
+  document.getElementById('type-card-firma').classList.remove('selected');
+  document.getElementById('type-card-osoba').classList.remove('selected');
+  document.getElementById('step1-next-btn').disabled = true;
+  document.getElementById('step1-next-btn').style.opacity = '.45';
+  document.getElementById('step1-next-btn').style.cursor = 'not-allowed';
+  // Reset progress
+  document.getElementById('prog-1').classList.add('done');
+  document.getElementById('prog-2').classList.remove('done');
+  // Reset form fields
+  ['f-name','f-nip','f-pkd','f-email','o-imie','o-nazwisko','o-pesel','o-zawod','o-email'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  ['f-type','f-opod','f-jpk','o-opod','o-ulgi'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.selectedIndex=0;
+  });
+  firmaSelectedColor = AVATAR_COLORS[0];
+  osobaSelectedColor = AVATAR_COLORS[4];
+  initColorSwatches();
+  updateFirmaPreview();
+  updateOsobaPreview();
+  openModal('add-client-modal');
+}
+
+function selectClientType(type) {
+  addClientType = type;
+  document.getElementById('type-card-firma').classList.toggle('selected', type==='firma');
+  document.getElementById('type-card-osoba').classList.toggle('selected', type==='osoba');
+  const btn = document.getElementById('step1-next-btn');
+  btn.disabled = false;
+  btn.style.opacity = '1';
+  btn.style.cursor = 'pointer';
+}
+
+function goToStep2() {
+  if (!addClientType) return;
+  document.getElementById('add-step-1').classList.remove('active');
+  document.getElementById('add-step-2-firma').classList.remove('active');
+  document.getElementById('add-step-2-osoba').classList.remove('active');
+  document.getElementById('add-step-2-' + addClientType).classList.add('active');
+  document.getElementById('prog-2').classList.add('done');
+}
+
+function goToStep1() {
+  document.getElementById('add-step-2-firma').classList.remove('active');
+  document.getElementById('add-step-2-osoba').classList.remove('active');
+  document.getElementById('add-step-1').classList.add('active');
+  document.getElementById('prog-2').classList.remove('done');
+}
+
+function getInitials(name) {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+  return name.slice(0,2).toUpperCase();
+}
+
+function updateFirmaPreview() {
+  const name = document.getElementById('f-name').value.trim() || 'Nowa firma';
+  const type = document.getElementById('f-type').value;
+  const email = document.getElementById('f-email').value.trim();
+  document.getElementById('preview-firma-av').style.background = firmaSelectedColor;
+  document.getElementById('preview-firma-av').textContent = getInitials(name);
+  document.getElementById('preview-firma-name').textContent = name + (type ? ' · ' + type : '');
+  document.getElementById('preview-firma-sub').textContent = email || 'Uzupełnij dane poniżej';
+}
+
+function updateOsobaPreview() {
+  const imie = document.getElementById('o-imie').value.trim();
+  const nazwisko = document.getElementById('o-nazwisko').value.trim();
+  const fullName = [imie, nazwisko].filter(Boolean).join(' ') || 'Nowa osoba';
+  const zawod = document.getElementById('o-zawod').value.trim();
+  const email = document.getElementById('o-email').value.trim();
+  document.getElementById('preview-osoba-av').style.background = osobaSelectedColor;
+  document.getElementById('preview-osoba-av').textContent = getInitials(fullName);
+  document.getElementById('preview-osoba-name').textContent = fullName;
+  document.getElementById('preview-osoba-sub').textContent = zawod || email || 'Uzupełnij dane poniżej';
+}
+
+function saveNewClient() {
+  const year = new Date().getFullYear().toString();
+  if (addClientType === 'firma') {
+    const name = document.getElementById('f-name').value.trim();
+    const type = document.getElementById('f-type').value;
+    const nip = document.getElementById('f-nip').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+    if (!name || !type || !nip || !email) { showToast('Uzupełnij wymagane pola (*)', false); return; }
+    if (!/^\d{10}$/.test(nip.replace(/[-\s]/g,''))) { showToast('NIP musi mieć 10 cyfr', false); return; }
+    const pkd = document.getElementById('f-pkd').value.trim();
+    const opod = document.getElementById('f-opod').value;
+    const jpk = document.getElementById('f-jpk').value;
+    const tags = [opod||'VAT czynny', jpk||'JPK V7M'].filter(Boolean);
+    const newClient = {
+      id: nextId++, name, email, nip, color: firmaSelectedColor,
+      initials: getInitials(name), type, pkd: pkd||'—', since: year, unread: 0,
+      stats: [{val:'—',label:'Obrót roczny'},{val:'—',label:'Faktur/mies.'},{val:jpk||'—',label:'Rozliczenie'}],
+      tags
+    };
+    FIRMY.push(newClient);
+    updateTabCounts();
+    closeModal('add-client-modal');
+    switchTab('firmy');
+    renderClientList(FIRMY);
+    setTimeout(()=>selectClient(newClient.id), 80);
+    showToast(`✅ Dodano: ${name}`, true);
+  } else {
+    const imie = document.getElementById('o-imie').value.trim();
+    const nazwisko = document.getElementById('o-nazwisko').value.trim();
+    const pesel = document.getElementById('o-pesel').value.trim();
+    const email = document.getElementById('o-email').value.trim();
+    if (!imie || !nazwisko || !pesel || !email) { showToast('Uzupełnij wymagane pola (*)', false); return; }
+    if (!/^\d{11}$/.test(pesel)) { showToast('PESEL musi mieć 11 cyfr', false); return; }
+    const zawod = document.getElementById('o-zawod').value.trim() || 'Klient';
+    const opod = document.getElementById('o-opod').value;
+    const ulgi = document.getElementById('o-ulgi').value;
+    const fullName = imie + ' ' + nazwisko;
+    const tags = [opod||'PIT-37', ulgi].filter(Boolean);
+    const newClient = {
+      id: nextId++, name: fullName, email, pesel, color: osobaSelectedColor,
+      initials: getInitials(fullName), zawod, since: year, unread: 0,
+      stats: [{val:'—',label:'Dochód roczny'},{val:opod||'PIT-37',label:'Deklaracja'},{val:'Skala',label:'Opodatkowanie'}],
+      tags
+    };
+    OSOBY.push(newClient);
+    updateTabCounts();
+    closeModal('add-client-modal');
+    switchTab('osoby');
+    renderClientList(OSOBY);
+    setTimeout(()=>selectClient(newClient.id), 80);
+    showToast(`✅ Dodano: ${fullName}`, true);
+  }
+}
+
 // ── MESSAGES ──
 function renderMsg(msg, scroll=true) {
   const area = document.getElementById('chat-area');
@@ -454,7 +894,6 @@ function renderMsg(msg, scroll=true) {
   div.className = 'msg-group ' + msg.role;
   const now = new Date().toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
   if (msg.role==='ai') {
-    const safeText = (msg.text||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     div.innerHTML = `<div class="msg-label"><div class="ai-icon">🤖</div> Księgowy.ai · ${now}</div>
       <div class="msg-bubble">${msg.html}
         <div><button class="msg-email-btn" onclick='openEmailModal(decodeURIComponent("${encodeURIComponent(msg.text||'')}"))'>✉️ Wyślij jako email do klienta</button></div>
@@ -470,10 +909,95 @@ function showTyping() {
   const area = document.getElementById('chat-area');
   const div = document.createElement('div');
   div.className='msg-group ai'; div.id='typing-indicator';
-  div.innerHTML=`<div class="msg-label"><div class="ai-icon">🤖</div> Księgowy.ai pisze...</div><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  div.innerHTML=`<div class="msg-label" id="typing-label"><div class="ai-icon">🤖</div> Księgowy.ai analizuje...</div><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
   area.appendChild(div); area.scrollTop = area.scrollHeight;
 }
 function removeTyping() { const t=document.getElementById('typing-indicator'); if(t) t.remove(); }
+function updateTypingLabel(text) {
+  const el = document.getElementById('typing-label');
+  if (el) el.innerHTML = `<div class="ai-icon">🔍</div> ${escHtml(text)}`;
+}
+
+// ── GEMINI AI ──
+async function callGeminiAI(userText, file, fileContent) {
+  try {
+    const c = activeClient;
+    const isPerson = c && !!c.pesel;
+    const clientContext = c
+      ? `\n\n## AKTYWNY KLIENT\nNazwa: ${c.name}\n${isPerson
+          ? `PESEL: ${c.pesel}, Zawód: ${c.zawod}`
+          : `NIP: ${c.nip}, Forma prawna: ${c.type}, PKD: ${c.pkd||'—'}`
+        }\nEmail: ${c.email}\nKlient od: ${c.since}\nTagi: ${c.tags.join(', ')}`
+      : '';
+
+    const systemInstruction = SYSTEM_PROMPT + clientContext;
+
+    // Budujemy historię w formacie Gemini
+    const rawHistory = (conversationHistory[activeClient?.id] || []).slice(-10);
+    const geminiContents = [];
+
+    for (const m of rawHistory.slice(0, -1)) {
+      geminiContents.push({
+        role: m.role === 'ai' ? 'model' : 'user',
+        parts: [{ text: m.text || '(plik)' }]
+      });
+    }
+
+    // Ostatnia wiadomość użytkownika — z opcjonalnym plikiem
+    const lastParts = [];
+    if (fileContent) {
+      lastParts.push({ text: `Wgrany plik: ${file?.name}\n\nZawartość (pierwsze 12 000 znaków):\n\n${fileContent.slice(0, 12000)}` });
+    }
+    lastParts.push({ text: userText || 'Przeanalizuj wgrany plik.' });
+    geminiContents.push({ role: 'user', parts: lastParts });
+
+    updateTypingLabel('Gemini analizuje dane...');
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKeyGemini}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemInstruction }] },
+          contents: geminiContents,
+          generationConfig: {
+            maxOutputTokens: 4000,
+            temperature: 0.3
+          },
+          tools: [{ google_search: {} }]
+        })
+      }
+    );
+
+    const data = await res.json();
+    removeTyping();
+
+    if (data.error) throw new Error(data.error.message);
+
+    // Wyciągnij tekst z odpowiedzi Gemini
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const responseText = parts
+      .filter(p => p.text)
+      .map(p => p.text)
+      .join('\n\n') || 'Brak odpowiedzi.';
+
+    // Sprawdź czy użył Google Search
+    const usedSearch = parts.some(p => p.executableCode || p.codeExecutionResult) ||
+      (data.candidates?.[0]?.groundingMetadata?.webSearchQueries?.length > 0);
+
+    const aiMsg = { role: 'ai', html: fmtAI(responseText, usedSearch), text: responseText };
+    if (activeClient) conversationHistory[activeClient.id].push(aiMsg);
+    renderMsg(aiMsg);
+
+  } catch(e) {
+    removeTyping();
+    renderMsg({ role: 'ai', html: `<p>❌ Błąd Gemini API: ${escHtml(e.message)}</p>`, text: '' });
+  }
+  setSendDisabled(false);
+}
+
+
 
 // ── SEND ──
 async function sendMessage() {
@@ -489,32 +1013,170 @@ async function sendMessage() {
   input.value=''; autoResize(input);
   const fileRef=attachedFile, fileContent=attachedFileContent;
   removeFile(); showTyping(); setSendDisabled(true);
-  if (apiKey) await callRealAI(text, fileRef, fileContent);
+  if (activeKey()) await callRealAI(text, fileRef, fileContent);
   else await mockAI(text, fileRef);
 }
 
+const SYSTEM_PROMPT = `Jesteś Księgowy.ai — profesjonalnym asystentem podatkowo-księgowym dla polskich biur rachunkowych. Działasz jak doświadczony księgowy z wieloletnim stażem i aktualną wiedzą na rok 2026.
+
+## TOŻSAMOŚĆ I STYL
+
+- Odpowiadasz WYŁĄCZNIE po polsku, profesjonalnie, rzeczowo i konkretnie
+- Nie jesteś chatbotem ogólnym — jesteś specjalistą od podatków i księgowości w Polsce
+- Mówisz jak ekspert: pewnie, precyzyjnie, bez owijania w bawełnę
+- Gdy czegoś nie wiesz na pewno — mówisz to wprost i sugerujesz weryfikację w KIS lub u doradcy podatkowego
+- Nie odpowiadasz na pytania niezwiązane z księgowością, podatkami i finansami firm
+- Nie używasz emotikonów ani nieformalnego języka
+
+## WIEDZA PODATKOWA — POLSKA 2026
+
+Znasz i stosujesz aktualne przepisy:
+
+VAT: stawki 23%, 8%, 5%, 0%, ZW; JPK_V7M i JPK_V7K — struktura i terminy; split payment — obowiązkowy i dobrowolny; biała lista podatników VAT; KSeF — aktualny status i obowiązki; kasy fiskalne online.
+
+PIT: skala podatkowa 12% do 120 000 zł, 32% powyżej; podatek liniowy 19% + składka zdrowotna 4,9%; ryczałt — stawki 2%, 3%, 5,5%, 8,5%, 10%, 12%, 12,5%, 14%, 15%, 17%; ulgi: na dzieci, B+R, IP Box, na powrót, dla seniora, dla rodzin 4+, rehabilitacyjna, termomodernizacyjna; deklaracje PIT-37, PIT-36, PIT-36L, PIT-28, PIT-40A.
+
+CIT: stawka 19%; mały podatnik 9% (limit 2 mln EUR); estoński CIT; minimalny podatek dochodowy.
+
+ZUS: mały ZUS plus; preferencyjny ZUS dla nowych firm; składka zdrowotna zależna od formy opodatkowania; terminy składek.
+
+Inne: MDR, ceny transferowe, OSS/IOSS, amortyzacja środków trwałych.
+
+## WERYFIKACJA PRZEPISÓW — WYSZUKIWANIE
+
+Masz dostęp do internetu. Gdy pytanie dotyczy aktualnych przepisów, stawek, terminów lub zmian prawnych — ZAWSZE przeszukujesz aktualne źródła przed odpowiedzią. Nie polegasz wyłącznie na wiedzy z treningu.
+
+Przeszukujesz w następującej kolejności:
+1. podatki.gov.pl — VAT, JPK, PIT, CIT, ulgi, terminy
+2. isap.sejm.gov.pl — pełne teksty ustaw i rozporządzeń
+3. sip.mf.gov.pl — interpretacje indywidualne KIS
+4. gov.pl/web/finanse — komunikaty Ministerstwa Finansów
+5. zus.pl — składki, podstawy wymiaru, terminy
+6. ksef.mf.gov.pl — KSeF, e-faktury
+7. orzeczenia.nsa.gov.pl — wyroki NSA/WSA (gdy kwestia sporna)
+8. infor.pl, podatki.biz, poradnikprzedsiebiorcy.pl — komentarz praktyczny
+
+Zasady wyszukiwania:
+- Gdy pytanie dotyczy stawki, limitu, terminu lub zmiany — weryfikujesz w źródle rządowym PRZED odpowiedzią
+- Podajesz źródło znalezionej informacji (np. "zgodnie z art. 41 ustawy o VAT, podatki.gov.pl")
+- Nie cytujesz liczb i terminów z pamięci bez weryfikacji
+- Gdy znajdziesz rozbieżność między źródłami — informujesz o tym i wskazujesz źródło rządowe jako nadrzędne
+
+## ANALIZA PLIKÓW JPK
+
+Gdy użytkownik wgra plik JPK, analizujesz go pod kątem:
+- Anomalii i nieprawidłowości (faktury z przyszłymi datami, brakujące NIP-y, kwoty niezgodne z deklaracją)
+- Nowych kontrahentów nieznanych z poprzednich miesięcy
+- Transakcji wymagających split payment
+- Pozycji do weryfikacji na białej liście
+- Struktury VAT — proporcja stawek, odliczenia
+- Największych transakcji i potencjalnych ryzyk
+
+Raportujesz wyniki zwięźle: konkretne numery faktur, kwoty, zalecenia.
+
+## CZEGO NIE ROBISZ
+
+- Nie wydajesz wiążących interpretacji podatkowych (sugerujesz wniosek o WIS/WIT)
+- Nie odpowiadasz na tematy niezwiązane z księgowością i finansami
+- Nie zmyślasz przepisów — gdy nie jesteś pewien aktualności, zaznaczasz to i weryfikujesz online`;
+
 async function callRealAI(userText, file, fileContent) {
+  if (aiProvider === 'gemini') {
+    await callGeminiAI(userText, file, fileContent);
+    return;
+  }
   try {
     const c = activeClient;
     const isPerson = c && !!c.pesel;
-    const sys = `Jesteś Księgowy.ai — asystentem AI dla polskich biur rachunkowych. Odpowiadasz wyłącznie po polsku, profesjonalnie i konkretnie.${c?`\nKlient: ${c.name}, ${isPerson?'PESEL: '+c.pesel+', Zawód: '+c.zawod:'NIP: '+c.nip+', Forma: '+c.type}, Email: ${c.email}, Tagi: ${c.tags.join(', ')}`:'' }`;
+
+    // Budujemy system prompt z danymi klienta
+    const clientContext = c
+      ? `\n\n## AKTYWNY KLIENT\nNazwa: ${c.name}\n${isPerson
+          ? `PESEL: ${c.pesel}, Zawód: ${c.zawod}`
+          : `NIP: ${c.nip}, Forma prawna: ${c.type}, PKD: ${c.pkd||'—'}`
+        }\nEmail: ${c.email}\nKlient od: ${c.since}\nTagi/cechy: ${c.tags.join(', ')}\nStatystyki: ${c.stats.map(s=>s.label+': '+s.val).join(', ')}`
+      : '';
+
+    const sys = SYSTEM_PROMPT + clientContext;
+
+    // Budujemy treść wiadomości
     const msgContent = [];
-    if (fileContent) msgContent.push({type:'text',text:`Plik ${file?.name}:\n\n${fileContent.slice(0,8000)}`});
-    msgContent.push({type:'text',text:userText||'Przeanalizuj plik.'});
-    const history = (conversationHistory[activeClient?.id]||[]).slice(-8).map(m=>({role:m.role==='ai'?'assistant':'user',content:m.text||'(plik)'}));
-    if (history.length && history[history.length-1].role==='user') history[history.length-1].content=msgContent;
-    else history.push({role:'user',content:msgContent});
-    const res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:history})});
+    if (fileContent) {
+      msgContent.push({
+        type: 'text',
+        text: `Wgrany plik: ${file?.name}\n\nZawartość pliku (pierwsze 12 000 znaków):\n\n${fileContent.slice(0, 12000)}`
+      });
+    }
+    msgContent.push({ type: 'text', text: userText || 'Przeanalizuj wgrany plik.' });
+
+    // Historia konwersacji (ostatnie 10 wiadomości)
+    const rawHistory = (conversationHistory[activeClient?.id] || []).slice(-10);
+    const messages = [];
+    for (const m of rawHistory) {
+      // pomiń ostatnią wiadomość usera bo dodamy ją z zawartością pliku
+      if (m === rawHistory[rawHistory.length - 1] && m.role === 'user') continue;
+      messages.push({
+        role: m.role === 'ai' ? 'assistant' : 'user',
+        content: m.text || '(plik)'
+      });
+    }
+    messages.push({ role: 'user', content: msgContent });
+
+    // Web search tool
+    const tools = [
+      {
+        type: 'web_search_20250305',
+        name: 'web_search'
+      }
+    ];
+
+    // Wskaźnik "szuka w internecie"
+    updateTypingLabel('Szukam aktualnych przepisów...');
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'interleaved-thinking-2025-05-14'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        system: sys,
+        tools,
+        messages
+      })
+    });
+
     const data = await res.json();
     removeTyping();
+
     if (data.error) throw new Error(data.error.message);
-    const responseText = data.content?.[0]?.text||'Brak odpowiedzi.';
-    const aiMsg = {role:'ai',html:fmtAI(responseText),text:responseText};
+
+    // Zbieramy tekst ze wszystkich bloków (może być kilka po tool_use)
+    const responseText = (data.content || [])
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('\n\n')
+      || 'Brak odpowiedzi.';
+
+    // Czy AI użył web searcha? — pokaż badge
+    const usedSearch = (data.content || []).some(b => b.type === 'tool_use' && b.name === 'web_search');
+
+    const aiMsg = { role: 'ai', html: fmtAI(responseText, usedSearch), text: responseText };
     if (activeClient) conversationHistory[activeClient.id].push(aiMsg);
     renderMsg(aiMsg);
-  } catch(e) { removeTyping(); renderMsg({role:'ai',html:`<p>❌ Błąd API: ${escHtml(e.message)}</p>`,text:''}); }
+
+  } catch(e) {
+    removeTyping();
+    renderMsg({ role: 'ai', html: `<p>❌ Błąd API: ${escHtml(e.message)}</p>`, text: '' });
+  }
   setSendDisabled(false);
 }
+
+
 
 async function mockAI(text, file) {
   await new Promise(r=>setTimeout(r,750+Math.random()*500));
@@ -537,8 +1199,22 @@ async function mockAI(text, file) {
   setSendDisabled(false);
 }
 
-function fmtAI(text) {
-  return '<p>' + text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/^- (.+)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>(\n|$))+/g,m=>`<ul>${m}</ul>`).replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>') + '</p>';
+function fmtAI(text, usedSearch = false) {
+  let html = text
+    .replace(/^### (.+)$/gm, '<h4 style="font-family:\'Syne\',sans-serif;font-size:13px;font-weight:700;margin:10px 0 4px;color:var(--dark)">$1</h4>')
+    .replace(/^## (.+)$/gm,  '<h3 style="font-family:\'Syne\',sans-serif;font-size:14px;font-weight:700;margin:12px 0 5px;color:var(--black)">$1</h3>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/^\d+\. (.+)$/gm, '<li style="margin-bottom:3px">$1</li>')
+    .replace(/^[-•] (.+)$/gm, '<li style="margin-bottom:3px">$1</li>')
+    .replace(/(<li[^>]*>[\s\S]*?<\/li>\n?)+/g, m => `<ul style="margin:6px 0;padding-left:18px">${m}</ul>`)
+    .replace(/\n\n/g, '</p><p style="margin-bottom:8px">')
+    .replace(/\n/g, '<br>');
+  html = `<p style="margin-bottom:8px">${html}</p>`;
+  if (usedSearch) {
+    html = `<div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:3px 9px;margin-bottom:10px;font-weight:500">🔍 Zweryfikowano w aktualnych źródłach</div>` + html;
+  }
+  return html;
 }
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function setSendDisabled(v) { document.getElementById('send-btn').disabled=v; }
@@ -590,7 +1266,6 @@ function sendEmail() {
   const subject = document.getElementById('email-subject').value.trim();
   const body = document.getElementById('email-body').value;
   if (!to || !subject) { showToast('Uzupełnij temat wiadomości', false); return; }
-  // TODO: zastąpić Gmail API
   window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   closeModal('email-modal');
   showToast('✉️ Otwieranie klienta email...', true);
@@ -599,17 +1274,45 @@ function sendEmail() {
 function stripHtml(html) { const d=document.createElement('div'); d.innerHTML=html; return d.textContent||d.innerText||''; }
 
 // ── API ──
-function openApiModal() { document.getElementById('api-key-input').value=apiKey; openModal('api-modal'); }
-function saveApiKey() {
-  apiKey=document.getElementById('api-key-input').value.trim();
-  if(apiKey) localStorage.setItem('ksapikey',apiKey); else localStorage.removeItem('ksapikey');
-  updateApiBtn(); closeModal('api-modal');
-  showToast(apiKey?'✅ AI aktywne!':'Klucz usunięty', !!apiKey);
+function selectProvider(p) {
+  aiProvider = p;
+  document.getElementById('prov-anthropic').classList.toggle('selected', p==='anthropic');
+  document.getElementById('prov-gemini').classList.toggle('selected', p==='gemini');
+  document.getElementById('api-section-anthropic').style.display = p==='anthropic' ? '' : 'none';
+  document.getElementById('api-section-gemini').style.display = p==='gemini' ? '' : 'none';
 }
+
+function openApiModal() {
+  // Wczytaj zapisane klucze
+  document.getElementById('api-key-anthropic').value = apiKeyAnthropic;
+  document.getElementById('api-key-gemini').value = apiKeyGemini;
+  selectProvider(aiProvider);
+  openModal('api-modal');
+}
+
+function saveApiKey() {
+  const antKey = document.getElementById('api-key-anthropic').value.trim();
+  const gemKey = document.getElementById('api-key-gemini').value.trim();
+
+  apiKeyAnthropic = antKey;
+  apiKeyGemini    = gemKey;
+  localStorage.setItem('ks-provider', aiProvider);
+  if (antKey) localStorage.setItem('ks-key-anthropic', antKey); else localStorage.removeItem('ks-key-anthropic');
+  if (gemKey) localStorage.setItem('ks-key-gemini', gemKey);    else localStorage.removeItem('ks-key-gemini');
+
+  updateApiBtn();
+  closeModal('api-modal');
+  showToast(activeKey() ? `✅ ${aiProvider==='gemini'?'Gemini':'Claude'} aktywny!` : 'Klucze zapisane', !!activeKey());
+}
+
 function updateApiBtn() {
-  const btn=document.getElementById('api-toggle-btn');
-  btn.classList.toggle('active',!!apiKey);
-  document.getElementById('api-btn-label').textContent=apiKey?'AI aktywne':'Klucz API';
+  const btn = document.getElementById('api-toggle-btn');
+  const hasKey = !!activeKey();
+  btn.classList.toggle('active', hasKey);
+  const label = hasKey
+    ? (aiProvider==='gemini' ? 'Gemini aktywny' : 'Claude aktywny')
+    : 'Klucz API';
+  document.getElementById('api-btn-label').textContent = label;
 }
 
 // ── MODALS ──
