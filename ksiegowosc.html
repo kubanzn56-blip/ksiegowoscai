@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Księgowy.ai — AI asystent dla biur rachunkowych</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f4f0;
+    --accent: #00e87a;
+    --accent-dim: #00c264;
+    --gray: #1a1a1a;
+    --gray2: #2a2a2a;
+    --gray3: #666;
+    --gray4: #999;
+    --border: rgba(255,255,255,0.08);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--accent); }
+
+  nav ul {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+
+  nav ul a {
+    color: var(--gray4);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    transition: color 0.2s;
+  }
+
+  nav ul a:hover { color: var(--white); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: var(--black) !important;
+    padding: 10px 22px;
+    border-radius: 100px;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    transition: background 0.2s !important;
+  }
+
+  .nav-cta:hover { background: var(--accent-dim) !important; color: var(--black) !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 140px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(0,232,122,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,232,122,0.1);
+    border: 1px solid rgba(0,232,122,0.25);
+    color: var(--accent);
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(42px, 7vw, 84px);
+    line-height: 1.0;
+    letter-spacing: -2px;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: clamp(16px, 2vw, 20px);
+    color: var(--gray4);
+    max-width: 560px;
+    font-weight: 300;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-form {
+    display: flex;
+    gap: 12px;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .hero-form input {
+    background: var(--gray2);
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 14px 20px;
+    border-radius: 100px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    width: 280px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .hero-form input::placeholder { color: var(--gray3); }
+  .hero-form input:focus { border-color: rgba(0,232,122,0.4); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--black);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 100px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+
+  .btn-primary:hover { background: var(--accent-dim); }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .hero-note {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--gray3);
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+
+  /* STATS */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 64px;
+    padding: 60px 48px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    animation: fadeUp 0.6s 0.5s ease both;
+  }
+
+  .stat-item { text-align: center; }
+
+  .stat-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: var(--gray4);
+    margin-top: 6px;
+  }
+
+  /* SECTIONS */
+  section { padding: 100px 48px; max-width: 1200px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(32px, 4vw, 52px);
+    letter-spacing: -1px;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+
+  .section-sub {
+    font-size: 18px;
+    color: var(--gray4);
+    font-weight: 300;
+    max-width: 540px;
+    margin-bottom: 64px;
+  }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .feature-card {
+    background: var(--gray);
+    padding: 40px 36px;
+    position: relative;
+    transition: background 0.3s;
+  }
+
+  .feature-card:hover { background: var(--gray2); }
+
+  .feature-card.wide {
+    grid-column: span 2;
+  }
+
+  .feature-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 20px;
+    opacity: 0.7;
+  }
+
+  .feature-icon {
+    width: 48px; height: 48px;
+    background: rgba(0,232,122,0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .feature-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .feature-card p {
+    font-size: 14px;
+    color: var(--gray4);
+    line-height: 1.7;
+  }
+
+  .feature-tag {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 4px 12px;
+    background: rgba(0,232,122,0.1);
+    border: 1px solid rgba(0,232,122,0.2);
+    border-radius: 100px;
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  /* HOW IT WORKS */
+  .how-section { background: var(--gray); }
+  .how-section-inner { max-width: 1200px; margin: 0 auto; padding: 100px 48px; }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    position: relative;
+  }
+
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 28px; left: 10%;
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.3;
+  }
+
+  .step { padding: 0 24px; }
+
+  .step-dot {
+    width: 56px; height: 56px;
+    background: var(--black);
+    border: 1px solid rgba(0,232,122,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--accent);
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .step p {
+    font-size: 14px;
+    color: var(--gray4);
+    line-height: 1.6;
+  }
+
+  /* PRICING */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .pricing-card {
+    background: var(--gray);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 36px;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+
+  .pricing-card:hover { border-color: rgba(0,232,122,0.2); }
+
+  .pricing-card.featured {
+    border-color: rgba(0,232,122,0.4);
+    background: rgba(0,232,122,0.05);
+  }
+
+  .featured-badge {
+    position: absolute;
+    top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: var(--black);
+    padding: 4px 16px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .plan-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gray4);
+    margin-bottom: 20px;
+  }
+
+  .plan-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .plan-price span {
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--gray4);
+  }
+
+  .plan-period {
+    font-size: 13px;
+    color: var(--gray3);
+    margin-bottom: 32px;
+  }
+
+  .plan-features {
+    list-style: none;
+    margin-bottom: 36px;
+  }
+
+  .plan-features li {
+    font-size: 14px;
+    color: var(--gray4);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .plan-features li::before {
+    content: '✓';
+    color: var(--accent);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .btn-outline {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 13px 24px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .btn-outline:hover { border-color: var(--accent); background: rgba(0,232,122,0.05); }
+
+  .btn-primary-full {
+    width: 100%;
+    background: var(--accent);
+    color: var(--black);
+    border: none;
+    padding: 13px 24px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary-full:hover { background: var(--accent-dim); }
+
+  /* FAQ */
+  .faq-list { max-width: 720px; }
+
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    padding: 24px 0;
+    cursor: pointer;
+  }
+
+  .faq-question {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .faq-icon {
+    width: 24px; height: 24px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--accent);
+    flex-shrink: 0;
+    transition: transform 0.3s;
+  }
+
+  .faq-answer {
+    font-size: 15px;
+    color: var(--gray4);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s;
+    line-height: 1.7;
+  }
+
+  .faq-item.open .faq-answer { max-height: 200px; padding-top: 16px; }
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+  /* CTA BOTTOM */
+  .cta-bottom {
+    background: var(--gray);
+    border-top: 1px solid var(--border);
+  }
+
+  .cta-bottom-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 48px;
+    text-align: center;
+  }
+
+  .cta-bottom h2 { margin-bottom: 16px; }
+  .cta-bottom p { color: var(--gray4); margin-bottom: 40px; font-size: 18px; }
+
+  .cta-form {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .cta-form input {
+    background: var(--black);
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 14px 20px;
+    border-radius: 100px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    width: 300px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .cta-form input:focus { border-color: rgba(0,232,122,0.4); }
+  .cta-form input::placeholder { color: var(--gray3); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 100%;
+  }
+
+  footer p { font-size: 13px; color: var(--gray3); }
+
+  footer ul {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+
+  footer ul a {
+    font-size: 13px;
+    color: var(--gray3);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  footer ul a:hover { color: var(--white); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 32px; right: 32px;
+    background: var(--accent);
+    color: var(--black);
+    padding: 14px 24px;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 999;
+    pointer-events: none;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    nav ul { display: none; }
+    .features-grid { grid-template-columns: 1fr; }
+    .feature-card.wide { grid-column: span 1; }
+    .steps { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .steps::before { display: none; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .stats { gap: 32px; flex-wrap: wrap; }
+    section { padding: 60px 24px; }
+    .hero-form { flex-direction: column; align-items: center; }
+    .hero-form input { width: 100%; max-width: 320px; }
+    .cta-form { flex-direction: column; align-items: center; }
+    footer { flex-direction: column; gap: 20px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Księgowy<span>.ai</span></div>
+  <ul>
+    <li><a href="#funkcje">Funkcje</a></li>
+    <li><a href="#jak-dziala">Jak działa</a></li>
+    <li><a href="#cennik">Cennik</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#lista" class="nav-cta">Dołącz do listy</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">Już wkrótce — dołącz do listy oczekujących</div>
+  <h1>AI asystent<br>dla Twojego<br><em>biura rachunkowego</em></h1>
+  <p class="hero-sub">Koniec z ręcznym przeglądaniem JPK, pisaniem komentarzy i gonienie za klientami. Księgowy.ai robi to za Ciebie.</p>
+  <form class="hero-form" onsubmit="handleSubmit(event, this)">
+    <input type="email" placeholder="twoj@email.pl" required>
+    <button type="submit" class="btn-primary">Dołącz do listy oczekujących →</button>
+  </form>
+  <p class="hero-note">Bezpłatny dostęp beta dla pierwszych 100 biur rachunkowych</p>
+</section>
+
+<!-- STATS -->
+<div class="stats reveal">
+  <div class="stat-item">
+    <div class="stat-number">17 000+</div>
+    <div class="stat-label">biur rachunkowych w Polsce</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">3h</div>
+    <div class="stat-label">dziennie tracone na rutynowe zadania</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">60s</div>
+    <div class="stat-label">i AI analizuje cały JPK klienta</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">0 PLN</div>
+    <div class="stat-label">w fazie beta dla pierwszych użytkowników</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="funkcje">
+  <div class="section-label">Funkcje</div>
+  <h2>Wszystko czego<br>potrzebuje Twoje biuro</h2>
+  <p class="section-sub">Pięć narzędzi które oszczędzają godziny pracy każdego tygodnia.</p>
+
+  <div class="features-grid reveal">
+    <div class="feature-card wide">
+      <div class="feature-number">01</div>
+      <div class="feature-icon">📊</div>
+      <h3>Chat z JPK klienta</h3>
+      <p>Wgraj plik JPK i zadawaj pytania po polsku. "Czy są tu anomalie?", "Którzy kontrahenci są nowi?", "Porównaj z poprzednim miesiącem". AI analizuje pełne dane finansowe klienta i odpowiada w kilka sekund — bez ręcznego przeglądania setek wierszy.</p>
+      <span class="feature-tag">⭐ Killer feature</span>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-number">02</div>
+      <div class="feature-icon">✉️</div>
+      <h3>Generator odpowiedzi na pytania klientów</h3>
+      <p>Klient pyta "czy mogę odliczyć samochód?" — dostajesz gotową odpowiedź do wysłania jednym kliknięciem. Koniec z odpowiadaniem na te same pytania po raz setny.</p>
+      <span class="feature-tag">Oszczędność 1h dziennie</span>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-number">03</div>
+      <div class="feature-icon">🔔</div>
+      <h3>Alerty o zmianach przepisów</h3>
+      <p>Nowy przepis? AI automatycznie informuje których Twoich klientów dotyczy i co konkretnie zrobić. KSeF, JPK_CIT, kasowy PIT — żadna zmiana Cię nie zaskoczy.</p>
+      <span class="feature-tag">Największy ból rynku</span>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-number">04</div>
+      <div class="feature-icon">📝</div>
+      <h3>Generator komentarzy do raportów</h3>
+      <p>Wklejasz liczby z Excela — dostajesz gotowy komentarz miesięczny dla klienta. "Przychody wzrosły o 12% r/r, głównie za sprawą..." Oszczędność 1-2 godzin tygodniowo.</p>
+      <span class="feature-tag">Gotowe w 30 sekund</span>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-number">05</div>
+      <div class="feature-icon">📅</div>
+      <h3>Asystent sezonu PIT</h3>
+      <p>Luty–kwiecień bez stresu. AI pomaga zebrać dokumenty od klientów, sprawdza czy zastosowano wszystkie ulgi i generuje spersonalizowane wyjaśnienie dla każdego klienta — dlaczego płaci tyle a nie mniej.</p>
+      <span class="feature-tag">Sezonowy hit</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="how-section">
+  <div class="how-section-inner" id="jak-dziala">
+    <div class="section-label">Jak to działa</div>
+    <h2>Gotowe w 4 minuty</h2>
+    <p class="section-sub" style="margin-bottom: 64px;">Żadnej instalacji, żadnych integracji. Zaczynasz od razu.</p>
+
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-dot">1</div>
+        <h4>Zakładasz konto</h4>
+        <p>Rejestracja zajmuje 60 sekund. Bez karty kredytowej w fazie beta.</p>
+      </div>
+      <div class="step">
+        <div class="step-dot">2</div>
+        <h4>Dodajesz klientów</h4>
+        <p>Tworzysz profile klientów biura. AI zapamiętuje kontekst każdego z nich.</p>
+      </div>
+      <div class="step">
+        <div class="step-dot">3</div>
+        <h4>Wgrywasz dokumenty</h4>
+        <p>JPK, faktury, wyciągi — wgrywasz i AI natychmiast zna dane finansowe klienta.</p>
+      </div>
+      <div class="step">
+        <div class="step-dot">4</div>
+        <h4>Pytasz po polsku</h4>
+        <p>Chat jak z asystentem który zna każdego Twojego klienta na wylot.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<section id="cennik">
+  <div class="section-label">Cennik</div>
+  <h2>Prosty, uczciwy cennik</h2>
+  <p class="section-sub">Bez ukrytych opłat. Pierwsze 100 biur dostaje dostęp beta za darmo.</p>
+
+  <div class="pricing-grid reveal">
+    <div class="pricing-card">
+      <div class="plan-name">Starter</div>
+      <div class="plan-price">199 <span>PLN</span></div>
+      <div class="plan-period">miesięcznie · do 20 klientów</div>
+      <ul class="plan-features">
+        <li>Chat z JPK — 50 zapytań/mies.</li>
+        <li>Generator komentarzy</li>
+        <li>Alerty o przepisach</li>
+        <li>1 użytkownik</li>
+        <li>Wsparcie email</li>
+      </ul>
+      <button class="btn-outline" onclick="showToast()">Dołącz do listy</button>
+    </div>
+
+    <div class="pricing-card featured">
+      <div class="featured-badge">Najpopularniejszy</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">299 <span>PLN</span></div>
+      <div class="plan-period">miesięcznie · do 60 klientów</div>
+      <ul class="plan-features">
+        <li>Chat z JPK — bez limitu</li>
+        <li>Generator odpowiedzi dla klientów</li>
+        <li>Asystent sezonu PIT</li>
+        <li>Alerty o przepisach</li>
+        <li>3 użytkowników</li>
+        <li>Wsparcie priorytetowe</li>
+      </ul>
+      <button class="btn-primary-full" onclick="showToast()">Dołącz do listy →</button>
+    </div>
+
+    <div class="pricing-card">
+      <div class="plan-name">Biuro</div>
+      <div class="plan-price">499 <span>PLN</span></div>
+      <div class="plan-period">miesięcznie · bez limitu klientów</div>
+      <ul class="plan-features">
+        <li>Wszystko z Pro</li>
+        <li>Nieograniczona liczba klientów</li>
+        <li>Nieograniczona liczba użytkowników</li>
+        <li>API dostęp</li>
+        <li>Dedykowany opiekun</li>
+      </ul>
+      <button class="btn-outline" onclick="showToast()">Dołącz do listy</button>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-label">FAQ</div>
+  <h2>Najczęstsze pytania</h2>
+
+  <div class="faq-list reveal">
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-question">
+        Czy moje dane klientów są bezpieczne?
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-answer">Tak. Dane są szyfrowane w transmisji i w spoczynku. Każde biuro ma izolowane środowisko — jeden klient biura nie widzi danych drugiego. Przechowujemy dane na serwerach w UE zgodnie z RODO.</div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-question">
+        Czy AI może się mylić w kwestiach podatkowych?
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-answer">Tak, jak każde narzędzie AI. Dlatego Księgowy.ai jest asystentem — zawsze cytuje źródło i zaznacza gdy odpowiedź wymaga weryfikacji przez specjalistę. Odpowiedzialność za decyzje podatkowe spoczywa na księgowym, nie na AI.</div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-question">
+        Jakie formaty plików obsługuje Księgowy.ai?
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-answer">JPK (XML), PDF faktury i dokumenty, Excel (xlsx, xls), pliki CSV. Wkrótce: integracje z Symfonią i Comarch.</div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-question">
+        Kiedy startuje beta?
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-answer">Planujemy uruchomienie bety w Q1 2025. Pierwsze 100 biur na liście oczekujących dostaje bezpłatny dostęp przez 3 miesiące oraz wpływ na kształt produktu.</div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-question">
+        Czy potrzebuję instalować cokolwiek?
+        <div class="faq-icon">+</div>
+      </div>
+      <div class="faq-answer">Nie. Księgowy.ai działa w przeglądarce. Żadnej instalacji, żadnych wtyczek. Działa na komputerze, tablecie i telefonie.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BOTTOM -->
+<div class="cta-bottom" id="lista">
+  <div class="cta-bottom-inner">
+    <div class="section-label">Dołącz teraz</div>
+    <h2>Bądź wśród pierwszych<br>100 biur rachunkowych</h2>
+    <p>Bezpłatny dostęp beta + wpływ na kształt produktu.<br>Bez zobowiązań, bez karty kredytowej.</p>
+    <form class="cta-form" onsubmit="handleSubmit(event, this)">
+      <input type="email" placeholder="twoj@biuro.pl" required>
+      <button type="submit" class="btn-primary">Dołącz do listy oczekujących →</button>
+    </form>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">Księgowy<span>.ai</span></div>
+  <p>© 2025 Księgowy.ai — AI asystent dla biur rachunkowych w Polsce</p>
+  <ul>
+    <li><a href="#">Polityka prywatności</a></li>
+    <li><a href="#">Regulamin</a></li>
+    <li><a href="#">Kontakt</a></li>
+  </ul>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ Zapisano na listę oczekujących!</div>
+
+<script>
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 100);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // FAQ toggle
+  function toggleFaq(item) {
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // Form submit
+  function handleSubmit(e, form) {
+    e.preventDefault();
+    showToast();
+    form.reset();
+  }
+
+  // Toast
+  function showToast() {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+</script>
+
+</body>
+</html>
