@@ -342,23 +342,16 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
   <div class="drag-overlay-sub">Obsługuje .xml, .csv, .xlsx, .pdf</div>
 </div>
 
-<!-- ══════════════════════════════════════ -->
 <!-- ADD CLIENT MODAL -->
-<!-- ══════════════════════════════════════ -->
 <div class="modal-overlay" id="add-client-modal" onclick="closeBg(event,'add-client-modal')">
   <div class="modal" style="width:520px">
-
-    <!-- PROGRESS -->
     <div class="modal-progress">
       <div class="modal-progress-dot done" id="prog-1"></div>
       <div class="modal-progress-dot" id="prog-2"></div>
     </div>
-
-    <!-- STEP 1: Wybór typu -->
     <div class="modal-step active" id="add-step-1">
       <h3>➕ Dodaj klienta</h3>
       <p style="margin-bottom:20px">Wybierz, kogo dodajesz do swojego biura rachunkowego.</p>
-
       <div class="type-picker">
         <div class="type-card" id="type-card-firma" onclick="selectClientType('firma')">
           <div class="type-card-icon">🏢</div>
@@ -371,14 +364,12 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
           <div class="type-card-desc">Prywatne osoby, emeryci, pracownicy — rozliczenia PIT</div>
         </div>
       </div>
-
       <div class="modal-actions" style="margin-top:24px">
         <button class="btn-modal-cancel" onclick="closeModal('add-client-modal')">Anuluj</button>
         <button class="btn-modal-save" id="step1-next-btn" onclick="goToStep2()" disabled style="opacity:.45;cursor:not-allowed">Dalej →</button>
       </div>
     </div>
 
-    <!-- STEP 2A: Formularz FIRMA -->
     <div class="modal-step" id="add-step-2-firma">
       <div class="add-client-preview" id="preview-firma">
         <div class="add-client-preview-avatar" id="preview-firma-av" style="background:#4f46e5">TB</div>
@@ -387,7 +378,6 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
           <div class="add-client-preview-sub" id="preview-firma-sub">Uzupełnij dane poniżej</div>
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-field">
           <label>Nazwa firmy <span class="required-star">*</span></label>
@@ -397,16 +387,11 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
           <label>Forma prawna <span class="required-star">*</span></label>
           <select id="f-type" onchange="updateFirmaPreview()">
             <option value="">— wybierz —</option>
-            <option>JDG</option>
-            <option>Sp. z o.o.</option>
-            <option>Sp. j.</option>
-            <option>Sp. k.</option>
-            <option>S.A.</option>
-            <option>Sp. p.</option>
+            <option>JDG</option><option>Sp. z o.o.</option><option>Sp. j.</option>
+            <option>Sp. k.</option><option>S.A.</option><option>Sp. p.</option>
           </select>
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-field">
           <label>NIP <span class="required-star">*</span></label>
@@ -417,42 +402,33 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
           <input type="text" id="f-pkd" placeholder="np. 62.01">
         </div>
       </div>
-
       <div class="form-row full">
         <div class="form-field">
           <label>Email kontaktowy <span class="required-star">*</span></label>
           <input type="email" id="f-email" placeholder="biuro@firma.pl" oninput="updateFirmaPreview()">
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-field">
           <label>Forma opodatkowania</label>
           <select id="f-opod">
             <option value="">— wybierz —</option>
-            <option>VAT czynny + CIT</option>
-            <option>VAT czynny + PIT liniowy</option>
-            <option>VAT czynny + PIT skala</option>
-            <option>Ryczałt</option>
-            <option>Brak VAT + PIT skala</option>
+            <option>VAT czynny + CIT</option><option>VAT czynny + PIT liniowy</option>
+            <option>VAT czynny + PIT skala</option><option>Ryczałt</option><option>Brak VAT + PIT skala</option>
           </select>
         </div>
         <div class="form-field">
           <label>Rozliczenie JPK</label>
           <select id="f-jpk">
             <option value="">— wybierz —</option>
-            <option>JPK V7M (miesięczny)</option>
-            <option>JPK V7K (kwartalny)</option>
-            <option>Brak VAT</option>
+            <option>JPK V7M (miesięczny)</option><option>JPK V7K (kwartalny)</option><option>Brak VAT</option>
           </select>
         </div>
       </div>
-
       <div class="form-field" style="margin-top:16px">
         <label>Kolor avatara</label>
         <div class="color-row" id="firma-colors"></div>
       </div>
-
       <div class="modal-actions" style="margin-top:24px">
         <button class="btn-modal-back" onclick="goToStep1()">← Wróć</button>
         <button class="btn-modal-cancel" onclick="closeModal('add-client-modal')">Anuluj</button>
@@ -460,7 +436,6 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
       </div>
     </div>
 
-    <!-- STEP 2B: Formularz OSOBA -->
     <div class="modal-step" id="add-step-2-osoba">
       <div class="add-client-preview">
         <div class="add-client-preview-avatar person" id="preview-osoba-av" style="background:#be185d">AN</div>
@@ -469,7 +444,6 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
           <div class="add-client-preview-sub" id="preview-osoba-sub">Uzupełnij dane poniżej</div>
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-field">
           <label>Imię <span class="required-star">*</span></label>
@@ -480,7 +454,6 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
           <input type="text" id="o-nazwisko" placeholder="np. Nowak" oninput="updateOsobaPreview()">
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-field">
           <label>PESEL <span class="required-star">*</span></label>
@@ -491,51 +464,40 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
           <input type="text" id="o-zawod" placeholder="np. Lekarz, Programista" oninput="updateOsobaPreview()">
         </div>
       </div>
-
       <div class="form-row full">
         <div class="form-field">
           <label>Email kontaktowy <span class="required-star">*</span></label>
           <input type="email" id="o-email" placeholder="anna.nowak@gmail.com" oninput="updateOsobaPreview()">
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-field">
           <label>Forma opodatkowania</label>
           <select id="o-opod">
             <option value="">— wybierz —</option>
-            <option>PIT-37 (skala)</option>
-            <option>PIT-36 (skala, działalność)</option>
-            <option>PIT-36L (liniowy 19%)</option>
-            <option>PIT-28 (ryczałt)</option>
-            <option>PIT-40A (emerytura ZUS)</option>
+            <option>PIT-37 (skala)</option><option>PIT-36 (skala, działalność)</option>
+            <option>PIT-36L (liniowy 19%)</option><option>PIT-28 (ryczałt)</option><option>PIT-40A (emerytura ZUS)</option>
           </select>
         </div>
         <div class="form-field">
           <label>Ulgi podatkowe</label>
           <select id="o-ulgi">
             <option value="">— brak / uzupełnić —</option>
-            <option>Ulga na dzieci</option>
-            <option>IP Box</option>
-            <option>Ulga rehabilitacyjna</option>
-            <option>Ulga dla seniora</option>
-            <option>Ulga na powrót</option>
+            <option>Ulga na dzieci</option><option>IP Box</option>
+            <option>Ulga rehabilitacyjna</option><option>Ulga dla seniora</option><option>Ulga na powrót</option>
           </select>
         </div>
       </div>
-
       <div class="form-field" style="margin-top:16px">
         <label>Kolor avatara</label>
         <div class="color-row" id="osoba-colors"></div>
       </div>
-
       <div class="modal-actions" style="margin-top:24px">
         <button class="btn-modal-back" onclick="goToStep1()">← Wróć</button>
         <button class="btn-modal-cancel" onclick="closeModal('add-client-modal')">Anuluj</button>
         <button class="btn-modal-save" onclick="saveNewClient()">✓ Zapisz klienta</button>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -544,13 +506,12 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
   <div class="modal" style="width:500px">
     <h3>🔑 Ustawienia AI</h3>
     <p>Wybierz dostawcę AI i wpisz swój klucz API. Klucze przechowywane są wyłącznie lokalnie w przeglądarce.</p>
-
     <label style="margin-top:0">Dostawca AI</label>
     <div style="display:flex;gap:10px;margin-top:4px">
       <div class="provider-card" id="prov-anthropic" onclick="selectProvider('anthropic')">
         <div class="provider-logo">✦</div>
-        <div class="provider-name">Claude Sonnet</div>
-        <div class="provider-sub">Anthropic · z web searchem</div>
+        <div class="provider-name">Claude Haiku 4.5</div>
+        <div class="provider-sub">Anthropic · szybki i wydajny</div>
       </div>
       <div class="provider-card" id="prov-gemini" onclick="selectProvider('gemini')">
         <div class="provider-logo" style="font-size:18px">✦</div>
@@ -558,21 +519,16 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
         <div class="provider-sub">Google · szybki i tani</div>
       </div>
     </div>
-
-    <!-- Anthropic key -->
     <div id="api-section-anthropic">
       <label>Klucz API Anthropic</label>
       <input type="password" id="api-key-anthropic" placeholder="sk-ant-api03-..." />
       <div class="modal-note">Pobierz klucz: <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a></div>
     </div>
-
-    <!-- Gemini key -->
     <div id="api-section-gemini" style="display:none">
       <label>Klucz API Google Gemini</label>
       <input type="password" id="api-key-gemini" placeholder="AIza..." />
       <div class="modal-note">Pobierz klucz: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent)">aistudio.google.com</a></div>
     </div>
-
     <div class="modal-note" style="margin-top:14px">🔒 Klucze zapisywane wyłącznie w localStorage — nigdy nie opuszczają urządzenia</div>
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeModal('api-modal')">Anuluj</button>
@@ -607,6 +563,14 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
 <input type="file" id="file-input" accept=".xml,.csv,.xlsx,.pdf,.txt" onchange="handleFileSelect(event)">
 
 <script>
+// ── KONFIGURACJA — wpisz swój klucz tutaj ──
+const CONFIG = {
+  ANTHROPIC_KEY: 'sk-ant-WPISZ-TUTAJ-SWOJ-KLUCZ',  // ← wpisz klucz Anthropic
+  GEMINI_KEY:    '',                                   // ← opcjonalnie klucz Gemini
+  DEFAULT_PROVIDER: 'anthropic'                        // 'anthropic' lub 'gemini'
+};
+// ────────────────────────────────────────────
+
 // ── DATA ──
 const FIRMY = [
   { id:1, name:'TechBud Sp. z o.o.', email:'kontakt@techbud.pl', nip:'7831234567', color:'#4f46e5', initials:'TB', type:'Sp. z o.o.', pkd:'62.01', since:'2021', unread:2, stats:[{val:'2 847 230 zł',label:'Obrót roczny'},{val:'94',label:'Faktur/mies.'},{val:'JPK V7M',label:'Rozliczenie'}], tags:['VAT czynny','PIT liniowy','KSeF aktywny'] },
@@ -625,28 +589,25 @@ const OSOBY = [
 
 let activeTab = 'firmy';
 let activeClient = null;
-let aiProvider = localStorage.getItem('ks-provider') || 'anthropic';
-let apiKeyAnthropic = localStorage.getItem('ks-key-anthropic') || '';
-let apiKeyGemini    = localStorage.getItem('ks-key-gemini') || '';
+let aiProvider = localStorage.getItem('ks-provider') || CONFIG.DEFAULT_PROVIDER;
+let apiKeyAnthropic = CONFIG.ANTHROPIC_KEY || localStorage.getItem('ks-key-anthropic') || '';
+let apiKeyGemini    = CONFIG.GEMINI_KEY    || localStorage.getItem('ks-key-gemini')    || '';
 let attachedFile = null, attachedFileContent = '';
 let conversationHistory = {};
 
 function activeKey() { return aiProvider === 'gemini' ? apiKeyGemini : apiKeyAnthropic; }
 
-// Add-client state
 let addClientType = null;
 const AVATAR_COLORS = ['#4f46e5','#0891b2','#dc2626','#b45309','#16a34a','#be185d','#7c3aed','#0284c7','#059669','#d97706','#db2777','#2563eb'];
 let firmaSelectedColor = AVATAR_COLORS[0];
 let osobaSelectedColor = AVATAR_COLORS[4];
 let nextId = 200;
 
-// INIT
 document.getElementById('count-firmy').textContent = FIRMY.length;
 document.getElementById('count-osoby').textContent = OSOBY.length;
 renderClientList(FIRMY);
 updateApiBtn();
 initColorSwatches();
-// Ustaw aktywny provider przy starcie
 selectProvider(aiProvider);
 
 function initColorSwatches() {
@@ -667,7 +628,6 @@ function pickColor(group, color, el) {
   else updateOsobaPreview();
 }
 
-// ── TABS ──
 function switchTab(tab) {
   activeTab = tab;
   document.getElementById('tab-firmy').classList.toggle('active', tab==='firmy');
@@ -678,7 +638,6 @@ function switchTab(tab) {
 
 function getCurrentList() { return activeTab==='firmy' ? FIRMY : OSOBY; }
 
-// ── SIDEBAR ──
 function renderClientList(clients) {
   const q = document.getElementById('client-search').value.toLowerCase();
   const list = q ? clients.filter(c => c.name.toLowerCase().includes(q) || (c.nip||c.pesel||'').includes(q) || c.email.toLowerCase().includes(q)) : clients;
@@ -698,7 +657,6 @@ function renderClientList(clients) {
 }
 
 function filterClients() { renderClientList(getCurrentList()); }
-
 function updateTabCounts() {
   document.getElementById('count-firmy').textContent = FIRMY.length;
   document.getElementById('count-osoby').textContent = OSOBY.length;
@@ -710,11 +668,8 @@ function selectClient(id) {
   activeClient.unread = 0;
   renderClientList(getCurrentList());
   const isPerson = !!activeClient.pesel;
-
   document.getElementById('topbar-client-name').textContent = activeClient.name;
   document.getElementById('email-topbar-btn').classList.add('visible');
-
-  // panel
   const panel = document.getElementById('client-panel');
   panel.style.display = 'flex';
   const av = document.getElementById('panel-avatar');
@@ -727,8 +682,6 @@ function selectClient(id) {
     : `<span class="meta-item">NIP: <strong>${activeClient.nip}</strong></span><span class="meta-item">Forma: <strong>${activeClient.type}</strong></span><span class="meta-item">Email: <strong>${activeClient.email}</strong></span><span class="meta-item">Klient od: <strong>${activeClient.since}</strong></span>`;
   document.getElementById('panel-tags').innerHTML = activeClient.tags.map((t,i)=>`<span class="tag ${['tag-green','tag-gray','tag-blue','tag-purple'][i%4]}">${t}</span>`).join('');
   document.getElementById('panel-stats').innerHTML = activeClient.stats.map(s=>`<div class="panel-stat"><div class="panel-stat-val">${s.val}</div><div class="panel-stat-label">${s.label}</div></div>`).join('');
-
-  // chat
   const area = document.getElementById('chat-area');
   if (!conversationHistory[id]) {
     conversationHistory[id] = [];
@@ -747,10 +700,9 @@ function selectClient(id) {
   document.getElementById('chat-input').focus();
 }
 
-// ── ADD CLIENT MODAL ──
+// ── ADD CLIENT ──
 function openAddClientModal() {
   addClientType = null;
-  // Reset step
   document.getElementById('add-step-1').classList.add('active');
   document.getElementById('add-step-2-firma').classList.remove('active');
   document.getElementById('add-step-2-osoba').classList.remove('active');
@@ -759,10 +711,8 @@ function openAddClientModal() {
   document.getElementById('step1-next-btn').disabled = true;
   document.getElementById('step1-next-btn').style.opacity = '.45';
   document.getElementById('step1-next-btn').style.cursor = 'not-allowed';
-  // Reset progress
   document.getElementById('prog-1').classList.add('done');
   document.getElementById('prog-2').classList.remove('done');
-  // Reset form fields
   ['f-name','f-nip','f-pkd','f-email','o-imie','o-nazwisko','o-pesel','o-zawod','o-email'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.value='';
   });
@@ -782,9 +732,7 @@ function selectClientType(type) {
   document.getElementById('type-card-firma').classList.toggle('selected', type==='firma');
   document.getElementById('type-card-osoba').classList.toggle('selected', type==='osoba');
   const btn = document.getElementById('step1-next-btn');
-  btn.disabled = false;
-  btn.style.opacity = '1';
-  btn.style.cursor = 'pointer';
+  btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
 }
 
 function goToStep2() {
@@ -844,17 +792,9 @@ function saveNewClient() {
     const opod = document.getElementById('f-opod').value;
     const jpk = document.getElementById('f-jpk').value;
     const tags = [opod||'VAT czynny', jpk||'JPK V7M'].filter(Boolean);
-    const newClient = {
-      id: nextId++, name, email, nip, color: firmaSelectedColor,
-      initials: getInitials(name), type, pkd: pkd||'—', since: year, unread: 0,
-      stats: [{val:'—',label:'Obrót roczny'},{val:'—',label:'Faktur/mies.'},{val:jpk||'—',label:'Rozliczenie'}],
-      tags
-    };
+    const newClient = { id: nextId++, name, email, nip, color: firmaSelectedColor, initials: getInitials(name), type, pkd: pkd||'—', since: year, unread: 0, stats: [{val:'—',label:'Obrót roczny'},{val:'—',label:'Faktur/mies.'},{val:jpk||'—',label:'Rozliczenie'}], tags };
     FIRMY.push(newClient);
-    updateTabCounts();
-    closeModal('add-client-modal');
-    switchTab('firmy');
-    renderClientList(FIRMY);
+    updateTabCounts(); closeModal('add-client-modal'); switchTab('firmy'); renderClientList(FIRMY);
     setTimeout(()=>selectClient(newClient.id), 80);
     showToast(`✅ Dodano: ${name}`, true);
   } else {
@@ -869,17 +809,9 @@ function saveNewClient() {
     const ulgi = document.getElementById('o-ulgi').value;
     const fullName = imie + ' ' + nazwisko;
     const tags = [opod||'PIT-37', ulgi].filter(Boolean);
-    const newClient = {
-      id: nextId++, name: fullName, email, pesel, color: osobaSelectedColor,
-      initials: getInitials(fullName), zawod, since: year, unread: 0,
-      stats: [{val:'—',label:'Dochód roczny'},{val:opod||'PIT-37',label:'Deklaracja'},{val:'Skala',label:'Opodatkowanie'}],
-      tags
-    };
+    const newClient = { id: nextId++, name: fullName, email, pesel, color: osobaSelectedColor, initials: getInitials(fullName), zawod, since: year, unread: 0, stats: [{val:'—',label:'Dochód roczny'},{val:opod||'PIT-37',label:'Deklaracja'},{val:'Skala',label:'Opodatkowanie'}], tags };
     OSOBY.push(newClient);
-    updateTabCounts();
-    closeModal('add-client-modal');
-    switchTab('osoby');
-    renderClientList(OSOBY);
+    updateTabCounts(); closeModal('add-client-modal'); switchTab('osoby'); renderClientList(OSOBY);
     setTimeout(()=>selectClient(newClient.id), 80);
     showToast(`✅ Dodano: ${fullName}`, true);
   }
@@ -918,105 +850,7 @@ function updateTypingLabel(text) {
   if (el) el.innerHTML = `<div class="ai-icon">🔍</div> ${escHtml(text)}`;
 }
 
-// ── GEMINI AI ──
-async function callGeminiAI(userText, file, fileContent) {
-  try {
-    const c = activeClient;
-    const isPerson = c && !!c.pesel;
-    const clientContext = c
-      ? `\n\n## AKTYWNY KLIENT\nNazwa: ${c.name}\n${isPerson
-          ? `PESEL: ${c.pesel}, Zawód: ${c.zawod}`
-          : `NIP: ${c.nip}, Forma prawna: ${c.type}, PKD: ${c.pkd||'—'}`
-        }\nEmail: ${c.email}\nKlient od: ${c.since}\nTagi: ${c.tags.join(', ')}`
-      : '';
-
-    const systemInstruction = SYSTEM_PROMPT + clientContext;
-
-    // Budujemy historię w formacie Gemini
-    const rawHistory = (conversationHistory[activeClient?.id] || []).slice(-10);
-    const geminiContents = [];
-
-    for (const m of rawHistory.slice(0, -1)) {
-      geminiContents.push({
-        role: m.role === 'ai' ? 'model' : 'user',
-        parts: [{ text: m.text || '(plik)' }]
-      });
-    }
-
-    // Ostatnia wiadomość użytkownika — z opcjonalnym plikiem
-    const lastParts = [];
-    if (fileContent) {
-      lastParts.push({ text: `Wgrany plik: ${file?.name}\n\nZawartość (pierwsze 12 000 znaków):\n\n${fileContent.slice(0, 12000)}` });
-    }
-    lastParts.push({ text: userText || 'Przeanalizuj wgrany plik.' });
-    geminiContents.push({ role: 'user', parts: lastParts });
-
-    updateTypingLabel('Gemini analizuje dane...');
-
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKeyGemini}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemInstruction }] },
-          contents: geminiContents,
-          generationConfig: {
-            maxOutputTokens: 4000,
-            temperature: 0.3
-          },
-          tools: [{ google_search: {} }]
-        })
-      }
-    );
-
-    const data = await res.json();
-    removeTyping();
-
-    if (data.error) throw new Error(data.error.message);
-
-    // Wyciągnij tekst z odpowiedzi Gemini
-    const parts = data.candidates?.[0]?.content?.parts || [];
-    const responseText = parts
-      .filter(p => p.text)
-      .map(p => p.text)
-      .join('\n\n') || 'Brak odpowiedzi.';
-
-    // Sprawdź czy użył Google Search
-    const usedSearch = parts.some(p => p.executableCode || p.codeExecutionResult) ||
-      (data.candidates?.[0]?.groundingMetadata?.webSearchQueries?.length > 0);
-
-    const aiMsg = { role: 'ai', html: fmtAI(responseText, usedSearch), text: responseText };
-    if (activeClient) conversationHistory[activeClient.id].push(aiMsg);
-    renderMsg(aiMsg);
-
-  } catch(e) {
-    removeTyping();
-    renderMsg({ role: 'ai', html: `<p>❌ Błąd Gemini API: ${escHtml(e.message)}</p>`, text: '' });
-  }
-  setSendDisabled(false);
-}
-
-
-
-// ── SEND ──
-async function sendMessage() {
-  const input = document.getElementById('chat-input');
-  const text = input.value.trim();
-  if (!text && !attachedFile) return;
-  let userHtml = '';
-  if (attachedFile) userHtml += `<div class="msg-attachment">📄 ${attachedFile.name}</div>`;
-  if (text) userHtml += `<p>${escHtml(text)}</p>`;
-  const userMsg = {role:'user', html:userHtml, text};
-  if (activeClient) { if (!conversationHistory[activeClient.id]) conversationHistory[activeClient.id]=[]; conversationHistory[activeClient.id].push(userMsg); }
-  renderMsg(userMsg);
-  input.value=''; autoResize(input);
-  const fileRef=attachedFile, fileContent=attachedFileContent;
-  removeFile(); showTyping(); setSendDisabled(true);
-  if (activeKey()) await callRealAI(text, fileRef, fileContent);
-  else await mockAI(text, fileRef);
-}
-
+// ── SYSTEM PROMPT ──
 const SYSTEM_PROMPT = `Jesteś Księgowy.ai — profesjonalnym asystentem podatkowo-księgowym dla polskich biur rachunkowych. Działasz jak doświadczony księgowy z wieloletnim stażem i aktualną wiedzą na rok 2026.
 
 ## TOŻSAMOŚĆ I STYL
@@ -1040,109 +874,95 @@ CIT: stawka 19%; mały podatnik 9% (limit 2 mln EUR); estoński CIT; minimalny p
 
 ZUS: mały ZUS plus; preferencyjny ZUS dla nowych firm; składka zdrowotna zależna od formy opodatkowania; terminy składek.
 
-Inne: MDR, ceny transferowe, OSS/IOSS, amortyzacja środków trwałych.
+Inne: MDR, ceny transferowe, OSS/IOSS, amortyzacja środków trwałych.`;
 
-## WERYFIKACJA PRZEPISÓW — WYSZUKIWANIE
-
-Masz dostęp do internetu. Gdy pytanie dotyczy aktualnych przepisów, stawek, terminów lub zmian prawnych — ZAWSZE przeszukujesz aktualne źródła przed odpowiedzią. Nie polegasz wyłącznie na wiedzy z treningu.
-
-Przeszukujesz w następującej kolejności:
-1. podatki.gov.pl — VAT, JPK, PIT, CIT, ulgi, terminy
-2. isap.sejm.gov.pl — pełne teksty ustaw i rozporządzeń
-3. sip.mf.gov.pl — interpretacje indywidualne KIS
-4. gov.pl/web/finanse — komunikaty Ministerstwa Finansów
-5. zus.pl — składki, podstawy wymiaru, terminy
-6. ksef.mf.gov.pl — KSeF, e-faktury
-7. orzeczenia.nsa.gov.pl — wyroki NSA/WSA (gdy kwestia sporna)
-8. infor.pl, podatki.biz, poradnikprzedsiebiorcy.pl — komentarz praktyczny
-
-Zasady wyszukiwania:
-- Gdy pytanie dotyczy stawki, limitu, terminu lub zmiany — weryfikujesz w źródle rządowym PRZED odpowiedzią
-- Podajesz źródło znalezionej informacji (np. "zgodnie z art. 41 ustawy o VAT, podatki.gov.pl")
-- Nie cytujesz liczb i terminów z pamięci bez weryfikacji
-- Gdy znajdziesz rozbieżność między źródłami — informujesz o tym i wskazujesz źródło rządowe jako nadrzędne
-
-## ANALIZA PLIKÓW JPK
-
-Gdy użytkownik wgra plik JPK, analizujesz go pod kątem:
-- Anomalii i nieprawidłowości (faktury z przyszłymi datami, brakujące NIP-y, kwoty niezgodne z deklaracją)
-- Nowych kontrahentów nieznanych z poprzednich miesięcy
-- Transakcji wymagających split payment
-- Pozycji do weryfikacji na białej liście
-- Struktury VAT — proporcja stawek, odliczenia
-- Największych transakcji i potencjalnych ryzyk
-
-Raportujesz wyniki zwięźle: konkretne numery faktur, kwoty, zalecenia.
-
-## CZEGO NIE ROBISZ
-
-- Nie wydajesz wiążących interpretacji podatkowych (sugerujesz wniosek o WIS/WIT)
-- Nie odpowiadasz na tematy niezwiązane z księgowością i finansami
-- Nie zmyślasz przepisów — gdy nie jesteś pewien aktualności, zaznaczasz to i weryfikujesz online`;
-
-async function callRealAI(userText, file, fileContent) {
-  if (aiProvider === 'gemini') {
-    await callGeminiAI(userText, file, fileContent);
-    return;
-  }
+// ── GEMINI AI ──
+async function callGeminiAI(userText, file, fileContent) {
   try {
     const c = activeClient;
     const isPerson = c && !!c.pesel;
+    const clientContext = c
+      ? `\n\n## AKTYWNY KLIENT\nNazwa: ${c.name}\n${isPerson
+          ? `PESEL: ${c.pesel}, Zawód: ${c.zawod}`
+          : `NIP: ${c.nip}, Forma prawna: ${c.type}, PKD: ${c.pkd||'—'}`
+        }\nEmail: ${c.email}\nKlient od: ${c.since}\nTagi: ${c.tags.join(', ')}`
+      : '';
+    const systemInstruction = SYSTEM_PROMPT + clientContext;
+    const rawHistory = (conversationHistory[activeClient?.id] || []).slice(-10);
+    const geminiContents = [];
+    for (const m of rawHistory.slice(0, -1)) {
+      geminiContents.push({ role: m.role === 'ai' ? 'model' : 'user', parts: [{ text: m.text || '(plik)' }] });
+    }
+    const lastParts = [];
+    if (fileContent) lastParts.push({ text: `Wgrany plik: ${file?.name}\n\nZawartość (pierwsze 12 000 znaków):\n\n${fileContent.slice(0, 12000)}` });
+    lastParts.push({ text: userText || 'Przeanalizuj wgrany plik.' });
+    geminiContents.push({ role: 'user', parts: lastParts });
+    updateTypingLabel('Gemini analizuje dane...');
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKeyGemini}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemInstruction }] },
+          contents: geminiContents,
+          generationConfig: { maxOutputTokens: 4000, temperature: 0.3 },
+          tools: [{ google_search: {} }]
+        })
+      }
+    );
+    const data = await res.json();
+    removeTyping();
+    if (data.error) throw new Error(data.error.message);
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const responseText = parts.filter(p => p.text).map(p => p.text).join('\n\n') || 'Brak odpowiedzi.';
+    const usedSearch = (data.candidates?.[0]?.groundingMetadata?.webSearchQueries?.length > 0);
+    const aiMsg = { role: 'ai', html: fmtAI(responseText, usedSearch), text: responseText };
+    if (activeClient) conversationHistory[activeClient.id].push(aiMsg);
+    renderMsg(aiMsg);
+  } catch(e) {
+    removeTyping();
+    renderMsg({ role: 'ai', html: `<p>❌ Błąd Gemini API: ${escHtml(e.message)}</p>`, text: '' });
+  }
+  setSendDisabled(false);
+}
 
-    // Budujemy system prompt z danymi klienta
+// ── CLAUDE AI ──   ✅ POPRAWIONO: apiKeyAnthropic, model haiku-4-5, usunięto beta header
+async function callClaudeAI(userText, file, fileContent) {
+  try {
+    const c = activeClient;
+    const isPerson = c && !!c.pesel;
     const clientContext = c
       ? `\n\n## AKTYWNY KLIENT\nNazwa: ${c.name}\n${isPerson
           ? `PESEL: ${c.pesel}, Zawód: ${c.zawod}`
           : `NIP: ${c.nip}, Forma prawna: ${c.type}, PKD: ${c.pkd||'—'}`
         }\nEmail: ${c.email}\nKlient od: ${c.since}\nTagi/cechy: ${c.tags.join(', ')}\nStatystyki: ${c.stats.map(s=>s.label+': '+s.val).join(', ')}`
       : '';
-
     const sys = SYSTEM_PROMPT + clientContext;
-
-    // Budujemy treść wiadomości
     const msgContent = [];
     if (fileContent) {
-      msgContent.push({
-        type: 'text',
-        text: `Wgrany plik: ${file?.name}\n\nZawartość pliku (pierwsze 12 000 znaków):\n\n${fileContent.slice(0, 12000)}`
-      });
+      msgContent.push({ type: 'text', text: `Wgrany plik: ${file?.name}\n\nZawartość pliku (pierwsze 12 000 znaków):\n\n${fileContent.slice(0, 12000)}` });
     }
     msgContent.push({ type: 'text', text: userText || 'Przeanalizuj wgrany plik.' });
-
-    // Historia konwersacji (ostatnie 10 wiadomości)
     const rawHistory = (conversationHistory[activeClient?.id] || []).slice(-10);
     const messages = [];
     for (const m of rawHistory) {
-      // pomiń ostatnią wiadomość usera bo dodamy ją z zawartością pliku
       if (m === rawHistory[rawHistory.length - 1] && m.role === 'user') continue;
-      messages.push({
-        role: m.role === 'ai' ? 'assistant' : 'user',
-        content: m.text || '(plik)'
-      });
+      messages.push({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.text || '(plik)' });
     }
     messages.push({ role: 'user', content: msgContent });
-
-    // Web search tool
-    const tools = [
-      {
-        type: 'web_search_20250305',
-        name: 'web_search'
-      }
-    ];
-
-    // Wskaźnik "szuka w internecie"
+    const tools = [{ type: 'web_search_20250305', name: 'web_search' }];
     updateTypingLabel('Szukam aktualnych przepisów...');
 
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('http://localhost:3000/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'interleaved-thinking-2025-05-14'
+        'x-api-key': apiKeyAnthropic,          // ✅ POPRAWKA 1: była tu błędna zmienna 'apiKey'
+        'anthropic-version': '2023-06-01'       // ✅ POPRAWKA 3: usunięto 'anthropic-beta'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',     // ✅ POPRAWKA 2: był hardcoded Sonnet
         max_tokens: 4000,
         system: sys,
         tools,
@@ -1152,23 +972,15 @@ async function callRealAI(userText, file, fileContent) {
 
     const data = await res.json();
     removeTyping();
-
     if (data.error) throw new Error(data.error.message);
-
-    // Zbieramy tekst ze wszystkich bloków (może być kilka po tool_use)
     const responseText = (data.content || [])
       .filter(b => b.type === 'text')
       .map(b => b.text)
-      .join('\n\n')
-      || 'Brak odpowiedzi.';
-
-    // Czy AI użył web searcha? — pokaż badge
+      .join('\n\n') || 'Brak odpowiedzi.';
     const usedSearch = (data.content || []).some(b => b.type === 'tool_use' && b.name === 'web_search');
-
     const aiMsg = { role: 'ai', html: fmtAI(responseText, usedSearch), text: responseText };
     if (activeClient) conversationHistory[activeClient.id].push(aiMsg);
     renderMsg(aiMsg);
-
   } catch(e) {
     removeTyping();
     renderMsg({ role: 'ai', html: `<p>❌ Błąd API: ${escHtml(e.message)}</p>`, text: '' });
@@ -1176,7 +988,27 @@ async function callRealAI(userText, file, fileContent) {
   setSendDisabled(false);
 }
 
-
+// ── SEND ──
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text && !attachedFile) return;
+  let userHtml = '';
+  if (attachedFile) userHtml += `<div class="msg-attachment">📄 ${attachedFile.name}</div>`;
+  if (text) userHtml += `<p>${escHtml(text)}</p>`;
+  const userMsg = {role:'user', html:userHtml, text};
+  if (activeClient) { if (!conversationHistory[activeClient.id]) conversationHistory[activeClient.id]=[]; conversationHistory[activeClient.id].push(userMsg); }
+  renderMsg(userMsg);
+  input.value=''; autoResize(input);
+  const fileRef=attachedFile, fileContent=attachedFileContent;
+  removeFile(); showTyping(); setSendDisabled(true);
+  if (activeKey()) {
+    if (aiProvider === 'gemini') await callGeminiAI(text, fileRef, fileContent);
+    else await callClaudeAI(text, fileRef, fileContent);
+  } else {
+    await mockAI(text, fileRef);
+  }
+}
 
 async function mockAI(text, file) {
   await new Promise(r=>setTimeout(r,750+Math.random()*500));
@@ -1184,13 +1016,13 @@ async function mockAI(text, file) {
   const isPerson = activeClient && !!activeClient.pesel;
   let html, responseText;
   if (file) {
-    responseText = `Wczytałem plik ${file.name}. Aby AI przeanalizował JPK, dodaj klucz API Anthropic klikając "Klucz API" w górnym pasku.`;
-    html = `<p>Wczytałem plik <strong>${file.name}</strong> 📄</p><p>Aby AI przeanalizował JPK, kliknij <strong>"Klucz API"</strong> i wpisz klucz Anthropic.</p><div class="highlight-box"><strong>Co mogę zrobić z JPK?</strong>Wykryć anomalie · Wskazać nowych kontrahentów · Sprawdzić split payment · Podsumować obroty</div>`;
+    responseText = `Wczytałem plik ${file.name}. Aby AI przeanalizował JPK, dodaj klucz API klikając "Klucz API" w górnym pasku.`;
+    html = `<p>Wczytałem plik <strong>${file.name}</strong> 📄</p><p>Aby AI przeanalizował JPK, kliknij <strong>"Klucz API"</strong> i wpisz klucz.</p><div class="highlight-box"><strong>Co mogę zrobić z JPK?</strong>Wykryć anomalie · Wskazać nowych kontrahentów · Sprawdzić split payment · Podsumować obroty</div>`;
   } else if (isPerson) {
     responseText = `Na podstawie profilu klienta ${activeClient.name} (${activeClient.tags.join(', ')}): potrzebuję dokumentów PIT, żeby odpowiedzieć szczegółowo.`;
     html = `<p>Na podstawie profilu klienta <strong>${activeClient.name}</strong>:</p><ul>${activeClient.tags.map(t=>`<li>${t}</li>`).join('')}</ul><div class="highlight-box"><strong>💡 Wskazówka</strong>Wgraj dokument PIT lub zeznanie, żebym mógł odpowiedzieć szczegółowo.</div>`;
   } else {
-    responseText = 'To jest tryb demonstracyjny. Aby uruchomić pełne AI, dodaj klucz API Anthropic.';
+    responseText = 'To jest tryb demonstracyjny. Aby uruchomić pełne AI, dodaj klucz API.';
     html = `<p>To tryb demonstracyjny — odpowiedzi są przykładowe.</p><p>Aby uruchomić pełne AI:</p><ul><li>Kliknij <strong>"Klucz API"</strong> w górnym pasku</li><li>Wpisz klucz ze strony <strong>console.anthropic.com</strong></li><li>Wgraj plik JPK i pytaj!</li></ul>`;
   }
   const aiMsg = {role:'ai',html,text:responseText};
@@ -1216,7 +1048,7 @@ function fmtAI(text, usedSearch = false) {
   }
   return html;
 }
-function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function setSendDisabled(v) { document.getElementById('send-btn').disabled=v; }
 
 // ── INPUT ──
@@ -1260,7 +1092,6 @@ function openEmailModal(msgText) {
   document.getElementById('email-body').value = bodyText;
   openModal('email-modal');
 }
-
 function sendEmail() {
   const to = activeClient?.email;
   const subject = document.getElementById('email-subject').value.trim();
@@ -1270,7 +1101,6 @@ function sendEmail() {
   closeModal('email-modal');
   showToast('✉️ Otwieranie klienta email...', true);
 }
-
 function stripHtml(html) { const d=document.createElement('div'); d.innerHTML=html; return d.textContent||d.innerText||''; }
 
 // ── API ──
@@ -1281,38 +1111,32 @@ function selectProvider(p) {
   document.getElementById('api-section-anthropic').style.display = p==='anthropic' ? '' : 'none';
   document.getElementById('api-section-gemini').style.display = p==='gemini' ? '' : 'none';
 }
-
 function openApiModal() {
-  // Wczytaj zapisane klucze
   document.getElementById('api-key-anthropic').value = apiKeyAnthropic;
   document.getElementById('api-key-gemini').value = apiKeyGemini;
   selectProvider(aiProvider);
   openModal('api-modal');
 }
-
 function saveApiKey() {
   const antKey = document.getElementById('api-key-anthropic').value.trim();
   const gemKey = document.getElementById('api-key-gemini').value.trim();
-
+  aiProvider = document.getElementById('prov-anthropic').classList.contains('selected') ? 'anthropic' : 'gemini';
   apiKeyAnthropic = antKey;
   apiKeyGemini    = gemKey;
   localStorage.setItem('ks-provider', aiProvider);
   if (antKey) localStorage.setItem('ks-key-anthropic', antKey); else localStorage.removeItem('ks-key-anthropic');
   if (gemKey) localStorage.setItem('ks-key-gemini', gemKey);    else localStorage.removeItem('ks-key-gemini');
-
   updateApiBtn();
   closeModal('api-modal');
   showToast(activeKey() ? `✅ ${aiProvider==='gemini'?'Gemini':'Claude'} aktywny!` : 'Klucze zapisane', !!activeKey());
 }
-
 function updateApiBtn() {
   const btn = document.getElementById('api-toggle-btn');
   const hasKey = !!activeKey();
   btn.classList.toggle('active', hasKey);
-  const label = hasKey
+  document.getElementById('api-btn-label').textContent = hasKey
     ? (aiProvider==='gemini' ? 'Gemini aktywny' : 'Claude aktywny')
     : 'Klucz API';
-  document.getElementById('api-btn-label').textContent = label;
 }
 
 // ── MODALS ──
