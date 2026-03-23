@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Księgowy.ai — Chat z JPK</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f5f3ee; --bg2: #eceae4; --white: #ffffff;
+  --black: #18181b; --dark: #27272a;
+  --accent: #16a34a; --accent-light: #22c55e;
+  --accent-bg: #f0fdf4; --accent-border: #bbf7d0;
+  --gray: #71717a; --gray2: #a1a1aa; --gray3: #e4e4e7;
+  --border: rgba(0,0,0,0.07);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --sidebar-w: 288px; --topbar-h: 60px;
+}
+html, body { height: 100%; overflow: hidden; }
+body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-serif; font-size: 15px; display: flex; flex-direction: column; }
+
+/* TOPBAR */
+.topbar { height: var(--topbar-h); background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px 0 0; flex-shrink: 0; z-index: 10; }
+.topbar-left { display: flex; align-items: center; height: 100%; width: var(--sidebar-w); padding: 0 20px; border-right: 1px solid var(--border); gap: 10px; flex-shrink: 0; }
+.logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -0.5px; color: var(--black); }
+.logo span { color: var(--accent); }
+.topbar-right { display: flex; align-items: center; gap: 10px; flex: 1; padding-left: 20px; }
+.topbar-client-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--black); }
+.topbar-badge { font-size: 12px; padding: 3px 10px; background: var(--accent-bg); border: 1px solid var(--accent-border); border-radius: 100px; color: var(--accent); font-weight: 500; display: none; }
+.topbar-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.api-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 10px; border: 1px solid var(--gray3); background: transparent; cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--gray); font-weight: 500; transition: all 0.15s; }
+.api-btn:hover { background: var(--bg2); color: var(--black); }
+.api-btn.active { background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent); }
+.api-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gray2); }
+.api-btn.active .api-dot { background: var(--accent-light); animation: pulse 2s infinite; }
+.email-topbar-btn { display: none; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 10px; border: 1px solid var(--gray3); background: transparent; cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--gray); font-weight: 500; transition: all 0.15s; }
+.email-topbar-btn:hover { background: #eff6ff; border-color: #bfdbfe; color: #2563eb; }
+.email-topbar-btn.visible { display: flex; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
+
+/* LAYOUT */
+.app-body { display: flex; flex: 1; overflow: hidden; }
+
+/* SIDEBAR */
+.sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; }
+.sidebar-search { padding: 12px 14px 8px; border-bottom: 1px solid var(--border); }
+.sidebar-search input { width: 100%; background: var(--bg); border: 1px solid var(--gray3); border-radius: 10px; padding: 8px 12px 8px 34px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--black); outline: none; transition: border-color 0.2s; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 10px center; }
+.sidebar-search input:focus { border-color: var(--accent); }
+.sidebar-search input::placeholder { color: var(--gray2); }
+
+/* TABS */
+.sidebar-tabs { display: flex; padding: 8px 10px 0; gap: 4px; border-bottom: 1px solid var(--border); background: var(--white); }
+.sidebar-tab { flex: 1; padding: 8px 10px; border-radius: 8px 8px 0 0; border: none; background: transparent; cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500; color: var(--gray2); transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 5px; position: relative; }
+.sidebar-tab:hover { color: var(--dark); }
+.sidebar-tab.active { color: var(--accent); font-weight: 600; }
+.sidebar-tab.active::after { content: ''; position: absolute; bottom: 0; left: 10%; width: 80%; height: 2px; background: var(--accent); border-radius: 2px 2px 0 0; }
+.tab-count { font-size: 11px; background: var(--bg2); color: var(--gray2); border-radius: 100px; padding: 1px 6px; font-weight: 600; }
+.sidebar-tab.active .tab-count { background: var(--accent-bg); color: var(--accent); }
+
+.sidebar-label { padding: 10px 14px 4px; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray2); }
+.client-list { flex: 1; overflow-y: auto; padding: 4px 8px 8px; }
+.client-list::-webkit-scrollbar { width: 4px; }
+.client-list::-webkit-scrollbar-thumb { background: var(--gray3); border-radius: 4px; }
+.client-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 12px; cursor: pointer; transition: background 0.15s; }
+.client-item:hover { background: var(--bg); }
+.client-item.active { background: var(--accent-bg); }
+.client-avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; color: white; flex-shrink: 0; }
+.client-avatar.person { border-radius: 50%; }
+.client-info { flex: 1; min-width: 0; }
+.client-name { font-size: 13px; font-weight: 500; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.client-sub { font-size: 11px; color: var(--gray2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.client-item.active .client-name { color: var(--accent); font-weight: 600; }
+.client-unread { width: 18px; height: 18px; background: var(--accent); border-radius: 50%; font-size: 10px; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.no-results { padding: 24px; text-align: center; color: var(--gray2); font-size: 13px; }
+.sidebar-footer { padding: 12px; border-top: 1px solid var(--border); }
+.add-client-btn { width: 100%; padding: 9px; border-radius: 10px; border: 1.5px dashed var(--gray3); background: transparent; cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--gray); font-weight: 500; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.add-client-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+
+/* MAIN */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* CLIENT PANEL */
+.client-panel { background: var(--white); border-bottom: 1px solid var(--border); padding: 12px 24px; display: none; align-items: flex-start; gap: 16px; flex-shrink: 0; }
+.client-panel-avatar { width: 48px; height: 48px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; color: white; flex-shrink: 0; }
+.client-panel-avatar.person { border-radius: 50%; }
+.client-panel-info { flex: 1; min-width: 0; }
+.client-panel-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; color: var(--black); margin-bottom: 3px; }
+.client-panel-meta { display: flex; gap: 14px; flex-wrap: wrap; }
+.meta-item { font-size: 12px; color: var(--gray); display: flex; align-items: center; gap: 3px; }
+.meta-item strong { color: var(--dark); font-weight: 500; }
+.client-panel-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.tag { font-size: 11px; padding: 2px 10px; border-radius: 100px; font-weight: 500; border: 1px solid; }
+.tag-green { background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent); }
+.tag-gray { background: var(--bg2); border-color: var(--gray3); color: var(--gray); }
+.tag-blue { background: #eff6ff; border-color: #bfdbfe; color: #2563eb; }
+.tag-purple { background: #f5f3ff; border-color: #ddd6fe; color: #7c3aed; }
+.client-panel-stats { display: flex; gap: 20px; flex-shrink: 0; }
+.panel-stat { text-align: right; }
+.panel-stat-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 17px; color: var(--black); }
+.panel-stat-label { font-size: 11px; color: var(--gray2); margin-top: 1px; }
+
+/* CHAT */
+.chat-area { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+.chat-area::-webkit-scrollbar { width: 5px; }
+.chat-area::-webkit-scrollbar-thumb { background: var(--gray3); border-radius: 4px; }
+.msg-group { display: flex; flex-direction: column; gap: 4px; }
+.msg-group.user { align-items: flex-end; }
+.msg-group.ai { align-items: flex-start; }
+.msg-label { font-size: 11px; color: var(--gray2); padding: 0 4px; margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+.ai-icon { width: 20px; height: 20px; background: var(--accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+.msg-bubble { max-width: 72%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.65; }
+.msg-group.user .msg-bubble { background: var(--accent); color: white; border-bottom-right-radius: 6px; }
+.msg-group.ai .msg-bubble { background: var(--white); color: var(--black); border-bottom-left-radius: 6px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.msg-bubble p { margin-bottom: 8px; }
+.msg-bubble p:last-child { margin-bottom: 0; }
+.msg-bubble ul { margin: 8px 0; padding-left: 16px; }
+.msg-bubble ul li { margin-bottom: 4px; }
+.msg-bubble .highlight-box { background: var(--accent-bg); border: 1px solid var(--accent-border); border-radius: 10px; padding: 10px 14px; margin-top: 10px; font-size: 13px; }
+.msg-bubble .highlight-box strong { color: var(--accent); display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.msg-email-btn { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; padding: 5px 12px; border-radius: 8px; border: 1px solid var(--gray3); background: var(--bg); cursor: pointer; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--gray); font-weight: 500; transition: all 0.15s; }
+.msg-email-btn:hover { border-color: #bfdbfe; background: #eff6ff; color: #2563eb; }
+.msg-attachment { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 10px; padding: 8px 12px; margin-top: 8px; font-size: 12px; }
+.msg-group.ai .msg-attachment { background: var(--bg); border-color: var(--gray3); }
+.typing-indicator { display: flex; align-items: center; gap: 6px; padding: 14px 16px; background: var(--white); border: 1px solid var(--border); border-radius: 18px; border-bottom-left-radius: 6px; box-shadow: var(--shadow); width: fit-content; }
+.typing-dot { width: 7px; height: 7px; background: var(--gray2); border-radius: 50%; animation: typingBounce 1.2s infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce { 0%,60%,100%{transform:translateY(0);opacity:.5} 30%{transform:translateY(-6px);opacity:1} }
+.chat-welcome { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; padding: 40px; color: var(--gray2); }
+.welcome-icon { width: 64px; height: 64px; background: var(--accent-bg); border: 2px solid var(--accent-border); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 8px; }
+.welcome-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--black); }
+.welcome-sub { font-size: 14px; max-width: 380px; line-height: 1.6; }
+.quick-prompts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; }
+.quick-prompt { padding: 8px 16px; border: 1.5px solid var(--gray3); border-radius: 100px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--dark); cursor: pointer; background: var(--white); transition: all 0.15s; }
+.quick-prompt:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+
+/* INPUT */
+.input-bar { padding: 14px 20px; background: var(--white); border-top: 1px solid var(--border); flex-shrink: 0; }
+.input-wrapper { display: flex; align-items: flex-end; gap: 10px; background: var(--bg); border: 1.5px solid var(--gray3); border-radius: 16px; padding: 10px 10px 10px 16px; transition: border-color 0.2s, box-shadow 0.2s; }
+.input-wrapper:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(22,163,74,0.10); }
+.file-drop-indicator { display: none; align-items: center; gap: 6px; padding: 5px 12px 5px 5px; background: var(--accent-bg); border: 1px solid var(--accent-border); border-radius: 10px; font-size: 12px; color: var(--accent); font-weight: 500; margin-bottom: 6px; }
+.file-drop-indicator.show { display: flex; }
+.file-drop-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+.file-drop-remove { cursor: pointer; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(22,163,74,0.15); font-size: 12px; }
+.file-drop-icon { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.input-column { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+#chat-input { background: transparent; border: none; outline: none; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--black); resize: none; line-height: 1.5; max-height: 120px; min-height: 24px; overflow-y: auto; }
+#chat-input::placeholder { color: var(--gray2); }
+.input-actions-row { display: flex; align-items: center; gap: 6px; }
+.attach-btn { display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--gray3); background: var(--white); cursor: pointer; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--gray); font-weight: 500; transition: all 0.15s; }
+.attach-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+.input-hint { font-size: 11px; color: var(--gray2); margin-left: auto; }
+.send-btn { width: 40px; height: 40px; background: var(--accent); border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s, transform 0.1s; box-shadow: 0 2px 8px rgba(22,163,74,0.3); }
+.send-btn:hover { background: #15803d; }
+.send-btn:active { transform: scale(0.95); }
+.send-btn svg { stroke: white; }
+.send-btn:disabled { background: var(--gray3); box-shadow: none; cursor: not-allowed; }
+
+/* MODALS */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(4px); }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal { background: var(--white); border-radius: 20px; padding: 32px; width: 490px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); transform: translateY(12px); transition: transform 0.2s; max-height: 90vh; overflow-y: auto; }
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal h3 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.modal > p { font-size: 13px; color: var(--gray); margin-bottom: 20px; line-height: 1.6; }
+.modal label { font-size: 12px; font-weight: 600; color: var(--dark); display: block; margin-bottom: 6px; margin-top: 16px; }
+.modal label:first-of-type { margin-top: 0; }
+.modal input[type=text], .modal input[type=password], .modal textarea { width: 100%; padding: 11px 14px; border: 1.5px solid var(--gray3); border-radius: 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--black); outline: none; transition: border-color 0.2s; }
+.modal input:focus, .modal textarea:focus { border-color: var(--accent); }
+.modal input::placeholder, .modal textarea::placeholder { color: var(--gray2); }
+.modal textarea { resize: vertical; min-height: 110px; line-height: 1.55; }
+.modal-note { font-size: 12px; color: var(--gray2); margin-top: 8px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+.btn-modal-cancel { flex: 1; padding: 11px; border: 1.5px solid var(--gray3); border-radius: 12px; background: transparent; cursor: pointer; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--gray); font-weight: 500; transition: all 0.15s; }
+.btn-modal-cancel:hover { background: var(--bg2); }
+.btn-modal-save { flex: 1; padding: 11px; border: none; border-radius: 12px; background: var(--accent); cursor: pointer; font-size: 14px; font-family: 'DM Sans', sans-serif; color: white; font-weight: 600; transition: background 0.15s; }
+.btn-modal-save:hover { background: #15803d; }
+.btn-modal-email { flex: 2; padding: 11px; border: none; border-radius: 12px; background: #2563eb; cursor: pointer; font-size: 14px; font-family: 'DM Sans', sans-serif; color: white; font-weight: 600; transition: background 0.15s; }
+.btn-modal-email:hover { background: #1d4ed8; }
+.email-to-row { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--bg); border: 1.5px solid var(--gray3); border-radius: 12px; font-size: 14px; color: var(--dark); }
+.email-to-row .to-label { color: var(--gray2); font-size: 12px; min-width: 20px; }
+.email-to-addr { font-weight: 500; color: var(--accent); }
+.gmail-note { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; font-size: 12px; color: #2563eb; margin-top: 14px; }
+
+/* DRAG */
+.drag-overlay { position: fixed; inset: 0; background: rgba(22,163,74,0.08); border: 3px dashed var(--accent); z-index: 50; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.drag-overlay.active { opacity: 1; pointer-events: all; }
+.drag-overlay-text { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; color: var(--accent); }
+.drag-overlay-sub { font-size: 14px; color: var(--accent); opacity: 0.7; }
+
+#file-input { display: none; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--black); color: white; padding: 12px 20px; border-radius: 12px; font-size: 13px; font-weight: 500; opacity: 0; transform: translateY(10px); transition: all 0.25s; z-index: 200; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo">Księgowy<span>.ai</span></div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-client-name" id="topbar-client-name">Wybierz klienta</div>
+    <div class="topbar-badge" id="topbar-badge">JPK wgrany</div>
+    <div class="topbar-actions">
+      <button class="email-topbar-btn" id="email-topbar-btn" onclick="openEmailModal(null)">✉️ Email do klienta</button>
+      <button class="api-btn" id="api-toggle-btn" onclick="openApiModal()">
+        <div class="api-dot"></div>
+        <span id="api-btn-label">Klucz API</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="app-body">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-search">
+      <input type="text" id="client-search" placeholder="Szukaj klienta..." oninput="filterClients()">
+    </div>
+    <div class="sidebar-tabs">
+      <button class="sidebar-tab active" id="tab-firmy" onclick="switchTab('firmy')">
+        🏢 Firmy <span class="tab-count" id="count-firmy">5</span>
+      </button>
+      <button class="sidebar-tab" id="tab-osoby" onclick="switchTab('osoby')">
+        👤 Osoby <span class="tab-count" id="count-osoby">4</span>
+      </button>
+    </div>
+    <div class="sidebar-label" id="sidebar-label">Firmy</div>
+    <div class="client-list" id="client-list"></div>
+    <div class="sidebar-footer">
+      <button class="add-client-btn" onclick="showToast('Funkcja dostępna wkrótce!', false)">+ Dodaj klienta</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- CLIENT PANEL -->
+    <div class="client-panel" id="client-panel">
+      <div class="client-panel-avatar" id="panel-avatar"></div>
+      <div class="client-panel-info">
+        <div class="client-panel-name" id="panel-name"></div>
+        <div class="client-panel-meta" id="panel-meta"></div>
+        <div class="client-panel-tags" id="panel-tags"></div>
+      </div>
+      <div class="client-panel-stats" id="panel-stats"></div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="chat-area" id="chat-area">
+      <div class="chat-welcome" id="chat-welcome">
+        <div class="welcome-icon">📊</div>
+        <div class="welcome-title">Chat z JPK klienta</div>
+        <div class="welcome-sub">Wybierz klienta z listy po lewej, wgraj jego plik JPK i zacznij zadawać pytania po polsku.</div>
+        <div class="quick-prompts">
+          <div class="quick-prompt" onclick="setPrompt(this.innerText)">Czy są tu anomalie?</div>
+          <div class="quick-prompt" onclick="setPrompt(this.innerText)">Którzy kontrahenci są nowi?</div>
+          <div class="quick-prompt" onclick="setPrompt(this.innerText)">Podsumuj obroty miesiąca</div>
+          <div class="quick-prompt" onclick="setPrompt(this.innerText)">Porównaj z poprzednim miesiącem</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="input-bar">
+      <div class="input-wrapper">
+        <div class="input-column">
+          <div class="file-drop-indicator" id="file-indicator">
+            <div class="file-drop-icon">📄</div>
+            <span class="file-drop-name" id="file-name-display"></span>
+            <div class="file-drop-remove" onclick="removeFile()">✕</div>
+          </div>
+          <textarea id="chat-input" placeholder="Wpisz pytanie o JPK klienta..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <div class="input-actions-row">
+            <button class="attach-btn" onclick="document.getElementById('file-input').click()">📎 Wgraj JPK</button>
+            <span class="input-hint">Enter — wyślij &nbsp;·&nbsp; Shift+Enter — nowa linia</span>
+          </div>
+        </div>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DRAG OVERLAY -->
+<div class="drag-overlay" id="drag-overlay">
+  <div style="font-size:48px">📄</div>
+  <div class="drag-overlay-text">Upuść plik JPK</div>
+  <div class="drag-overlay-sub">Obsługuje .xml, .csv, .xlsx, .pdf</div>
+</div>
+
+<!-- API MODAL -->
+<div class="modal-overlay" id="api-modal" onclick="closeBg(event,'api-modal')">
+  <div class="modal">
+    <h3>🔑 Klucz API Anthropic</h3>
+    <p>Wpisz swój klucz API, aby chat działał z prawdziwym AI. Klucz przechowywany jest tylko lokalnie w Twojej przeglądarce i nigdy nie opuszcza urządzenia.</p>
+    <label>Klucz API</label>
+    <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." />
+    <div class="modal-note">🔒 Zapisywany wyłącznie w localStorage przeglądarki</div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal('api-modal')">Anuluj</button>
+      <button class="btn-modal-save" onclick="saveApiKey()">Zapisz i włącz AI</button>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL MODAL -->
+<div class="modal-overlay" id="email-modal" onclick="closeBg(event,'email-modal')">
+  <div class="modal">
+    <h3>✉️ Wyślij email do klienta</h3>
+    <p>Możesz edytować treść przed wysłaniem. Wiadomość trafi na adres email klienta.</p>
+    <label>Odbiorca</label>
+    <div class="email-to-row">
+      <span class="to-label">Do:</span>
+      <span class="email-to-addr" id="email-to-addr">—</span>
+    </div>
+    <label>Temat</label>
+    <input type="text" id="email-subject" placeholder="Temat wiadomości..." />
+    <label>Treść wiadomości</label>
+    <textarea id="email-body" rows="6" placeholder="Treść..."></textarea>
+    <div class="gmail-note">📬 Teraz otwiera domyślnego klienta email (mailto:). Wysyłka przez Gmail API — wkrótce!</div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal('email-modal')">Anuluj</button>
+      <button class="btn-modal-email" onclick="sendEmail()">✉️ Wyślij email</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="file-input" accept=".xml,.csv,.xlsx,.pdf,.txt" onchange="handleFileSelect(event)">
+
+<script>
+// ── DATA ──
+const FIRMY = [
+  { id:1, name:'TechBud Sp. z o.o.', email:'kontakt@techbud.pl', nip:'7831234567', color:'#4f46e5', initials:'TB', type:'Sp. z o.o.', pkd:'62.01', since:'2021', unread:2, stats:[{val:'2 847 230 zł',label:'Obrót roczny'},{val:'94',label:'Faktur/mies.'},{val:'JPK V7M',label:'Rozliczenie'}], tags:['VAT czynny','PIT liniowy','KSeF aktywny'] },
+  { id:2, name:'Kowalski Usługi', email:'biuro@kowalski-uslugi.pl', nip:'6512987654', color:'#0891b2', initials:'KU', type:'JDG', pkd:'43.21', since:'2019', unread:0, stats:[{val:'480 000 zł',label:'Obrót roczny'},{val:'18',label:'Faktur/mies.'},{val:'Ryczałt',label:'Opodatkowanie'}], tags:['Ryczałt 8,5%','Brak VAT','Kasa fiskalna'] },
+  { id:3, name:'Restauracja Nowa Fala', email:'nowa-fala@gmail.com', nip:'9521476380', color:'#dc2626', initials:'NF', type:'Sp. j.', pkd:'56.10', since:'2022', unread:1, stats:[{val:'1 240 000 zł',label:'Obrót roczny'},{val:'210',label:'Faktur/mies.'},{val:'JPK V7M',label:'Rozliczenie'}], tags:['VAT czynny','Kasa fiskalna','Split payment'] },
+  { id:4, name:'AutoMechanik Wiśniewski', email:'auto@wisniewski-mech.pl', nip:'7712345890', color:'#b45309', initials:'AW', type:'JDG', pkd:'45.20', since:'2020', unread:0, stats:[{val:'390 000 zł',label:'Obrót roczny'},{val:'45',label:'Faktur/mies.'},{val:'PIT skala',label:'Opodatkowanie'}], tags:['VAT czynny','PIT skala','Samochód służbowy'] },
+  { id:5, name:'Zielone Ogródki Sp. z o.o.', email:'zarzad@zielone-ogrodki.pl', nip:'8831234100', color:'#16a34a', initials:'ZO', type:'Sp. z o.o.', pkd:'01.30', since:'2023', unread:0, stats:[{val:'620 000 zł',label:'Obrót roczny'},{val:'32',label:'Faktur/mies.'},{val:'CIT 9%',label:'Opodatkowanie'}], tags:['CIT 9%','VAT czynny','Nowa spółka'] },
+];
+
+const OSOBY = [
+  { id:101, name:'Anna Nowak', email:'anna.nowak@gmail.com', pesel:'87041512345', color:'#be185d', initials:'AN', zawod:'Lekarz', since:'2022', unread:0, stats:[{val:'180 000 zł',label:'Dochód roczny'},{val:'PIT-37',label:'Deklaracja'},{val:'Skala',label:'Opodatkowanie'}], tags:['PIT-37','Ulga na dzieci','Dochody za granicą'] },
+  { id:102, name:'Marek Zając', email:'marek.zajac@wp.pl', pesel:'79080312345', color:'#7c3aed', initials:'MZ', zawod:'Informatyk', since:'2020', unread:3, stats:[{val:'210 000 zł',label:'Dochód roczny'},{val:'PIT-36L',label:'Deklaracja'},{val:'Liniowy 19%',label:'Opodatkowanie'}], tags:['PIT-36L','IP Box','B2B'] },
+  { id:103, name:'Karolina Wiśniewska', email:'k.wisniewska@onet.pl', pesel:'92051623456', color:'#0284c7', initials:'KW', zawod:'Architekt', since:'2021', unread:0, stats:[{val:'95 000 zł',label:'Dochód roczny'},{val:'PIT-36',label:'Deklaracja'},{val:'Skala',label:'Opodatkowanie'}], tags:['PIT-36','Najem prywatny','Ulga rehabilitacyjna'] },
+  { id:104, name:'Tomasz Dąbrowski', email:'tdabrowski@gmail.com', pesel:'65102934567', color:'#059669', initials:'TD', zawod:'Emeryt', since:'2023', unread:1, stats:[{val:'48 000 zł',label:'Dochód roczny'},{val:'PIT-40A',label:'Deklaracja'},{val:'Skala',label:'Opodatkowanie'}], tags:['PIT-40A','Emerytura ZUS','Ulga dla seniora'] },
+];
+
+let activeTab = 'firmy';
+let activeClient = null;
+let apiKey = localStorage.getItem('ksapikey') || '';
+let attachedFile = null, attachedFileContent = '';
+let conversationHistory = {};
+
+// INIT
+document.getElementById('count-firmy').textContent = FIRMY.length;
+document.getElementById('count-osoby').textContent = OSOBY.length;
+renderClientList(FIRMY);
+updateApiBtn();
+
+// ── TABS ──
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById('tab-firmy').classList.toggle('active', tab==='firmy');
+  document.getElementById('tab-osoby').classList.toggle('active', tab==='osoby');
+  document.getElementById('sidebar-label').textContent = tab==='firmy' ? 'Firmy' : 'Osoby fizyczne';
+  renderClientList(tab==='firmy' ? FIRMY : OSOBY);
+}
+
+function getCurrentList() { return activeTab==='firmy' ? FIRMY : OSOBY; }
+
+// ── SIDEBAR ──
+function renderClientList(clients) {
+  const q = document.getElementById('client-search').value.toLowerCase();
+  const list = q ? clients.filter(c => c.name.toLowerCase().includes(q) || (c.nip||c.pesel||'').includes(q) || c.email.toLowerCase().includes(q)) : clients;
+  const el = document.getElementById('client-list');
+  if (!list.length) { el.innerHTML = '<div class="no-results">Brak wyników wyszukiwania</div>'; return; }
+  el.innerHTML = list.map(c => {
+    const isPerson = !!c.pesel;
+    return `<div class="client-item ${activeClient?.id===c.id?'active':''}" onclick="selectClient(${c.id})">
+      <div class="client-avatar ${isPerson?'person':''}" style="background:${c.color}">${c.initials}</div>
+      <div class="client-info">
+        <div class="client-name">${c.name}</div>
+        <div class="client-sub">${isPerson ? c.zawod : c.type} · ${c.email}</div>
+      </div>
+      ${c.unread ? `<div class="client-unread">${c.unread}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function filterClients() { renderClientList(getCurrentList()); }
+
+function selectClient(id) {
+  const all = [...FIRMY, ...OSOBY];
+  activeClient = all.find(c => c.id===id);
+  activeClient.unread = 0;
+  renderClientList(getCurrentList());
+  const isPerson = !!activeClient.pesel;
+
+  document.getElementById('topbar-client-name').textContent = activeClient.name;
+  document.getElementById('email-topbar-btn').classList.add('visible');
+
+  // panel
+  const panel = document.getElementById('client-panel');
+  panel.style.display = 'flex';
+  const av = document.getElementById('panel-avatar');
+  av.style.background = activeClient.color;
+  av.textContent = activeClient.initials;
+  av.className = 'client-panel-avatar' + (isPerson?' person':'');
+  document.getElementById('panel-name').textContent = activeClient.name;
+  document.getElementById('panel-meta').innerHTML = isPerson
+    ? `<span class="meta-item">PESEL: <strong>${activeClient.pesel.slice(0,6)}·····</strong></span><span class="meta-item">Zawód: <strong>${activeClient.zawod}</strong></span><span class="meta-item">Email: <strong>${activeClient.email}</strong></span><span class="meta-item">Klient od: <strong>${activeClient.since}</strong></span>`
+    : `<span class="meta-item">NIP: <strong>${activeClient.nip}</strong></span><span class="meta-item">Forma: <strong>${activeClient.type}</strong></span><span class="meta-item">Email: <strong>${activeClient.email}</strong></span><span class="meta-item">Klient od: <strong>${activeClient.since}</strong></span>`;
+  document.getElementById('panel-tags').innerHTML = activeClient.tags.map((t,i)=>`<span class="tag ${['tag-green','tag-gray','tag-blue','tag-purple'][i%4]}">${t}</span>`).join('');
+  document.getElementById('panel-stats').innerHTML = activeClient.stats.map(s=>`<div class="panel-stat"><div class="panel-stat-val">${s.val}</div><div class="panel-stat-label">${s.label}</div></div>`).join('');
+
+  // chat
+  const area = document.getElementById('chat-area');
+  if (!conversationHistory[id]) {
+    conversationHistory[id] = [];
+    const qp = isPerson
+      ? `<div class="quick-prompt" onclick="setPrompt(this.innerText)">Jakie ulgi przysługują?</div><div class="quick-prompt" onclick="setPrompt(this.innerText)">Ile zwrotu może dostać?</div><div class="quick-prompt" onclick="setPrompt(this.innerText)">Przygotuj podsumowanie PIT</div>`
+      : `<div class="quick-prompt" onclick="setPrompt(this.innerText)">Czy są tu anomalie?</div><div class="quick-prompt" onclick="setPrompt(this.innerText)">Podsumuj obroty miesiąca</div><div class="quick-prompt" onclick="setPrompt(this.innerText)">Sprawdź split payment</div>`;
+    area.innerHTML = `<div class="chat-welcome" id="chat-welcome">
+      <div class="welcome-icon" style="background:${activeClient.color}18;border-color:${activeClient.color}40;border-radius:${isPerson?'50%':'20px'}">${activeClient.initials}</div>
+      <div class="welcome-title">Chat — ${activeClient.name}</div>
+      <div class="welcome-sub">Wgraj ${isPerson?'plik PIT':'plik JPK'} tego klienta i zacznij pytać AI po polsku.</div>
+      <div class="quick-prompts">${qp}</div></div>`;
+  } else {
+    area.innerHTML = '';
+    conversationHistory[id].forEach(m => renderMsg(m, false));
+  }
+  document.getElementById('chat-input').focus();
+}
+
+// ── MESSAGES ──
+function renderMsg(msg, scroll=true) {
+  const area = document.getElementById('chat-area');
+  const w = document.getElementById('chat-welcome');
+  if (w) w.remove();
+  const div = document.createElement('div');
+  div.className = 'msg-group ' + msg.role;
+  const now = new Date().toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
+  if (msg.role==='ai') {
+    const safeText = (msg.text||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    div.innerHTML = `<div class="msg-label"><div class="ai-icon">🤖</div> Księgowy.ai · ${now}</div>
+      <div class="msg-bubble">${msg.html}
+        <div><button class="msg-email-btn" onclick='openEmailModal(decodeURIComponent("${encodeURIComponent(msg.text||'')}"))'>✉️ Wyślij jako email do klienta</button></div>
+      </div>`;
+  } else {
+    div.innerHTML = `<div class="msg-label" style="justify-content:flex-end">Ty · ${now}</div><div class="msg-bubble">${msg.html}</div>`;
+  }
+  area.appendChild(div);
+  if (scroll) area.scrollTop = area.scrollHeight;
+}
+
+function showTyping() {
+  const area = document.getElementById('chat-area');
+  const div = document.createElement('div');
+  div.className='msg-group ai'; div.id='typing-indicator';
+  div.innerHTML=`<div class="msg-label"><div class="ai-icon">🤖</div> Księgowy.ai pisze...</div><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  area.appendChild(div); area.scrollTop = area.scrollHeight;
+}
+function removeTyping() { const t=document.getElementById('typing-indicator'); if(t) t.remove(); }
+
+// ── SEND ──
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text && !attachedFile) return;
+  let userHtml = '';
+  if (attachedFile) userHtml += `<div class="msg-attachment">📄 ${attachedFile.name}</div>`;
+  if (text) userHtml += `<p>${escHtml(text)}</p>`;
+  const userMsg = {role:'user', html:userHtml, text};
+  if (activeClient) { if (!conversationHistory[activeClient.id]) conversationHistory[activeClient.id]=[]; conversationHistory[activeClient.id].push(userMsg); }
+  renderMsg(userMsg);
+  input.value=''; autoResize(input);
+  const fileRef=attachedFile, fileContent=attachedFileContent;
+  removeFile(); showTyping(); setSendDisabled(true);
+  if (apiKey) await callRealAI(text, fileRef, fileContent);
+  else await mockAI(text, fileRef);
+}
+
+async function callRealAI(userText, file, fileContent) {
+  try {
+    const c = activeClient;
+    const isPerson = c && !!c.pesel;
+    const sys = `Jesteś Księgowy.ai — asystentem AI dla polskich biur rachunkowych. Odpowiadasz wyłącznie po polsku, profesjonalnie i konkretnie.${c?`\nKlient: ${c.name}, ${isPerson?'PESEL: '+c.pesel+', Zawód: '+c.zawod:'NIP: '+c.nip+', Forma: '+c.type}, Email: ${c.email}, Tagi: ${c.tags.join(', ')}`:'' }`;
+    const msgContent = [];
+    if (fileContent) msgContent.push({type:'text',text:`Plik ${file?.name}:\n\n${fileContent.slice(0,8000)}`});
+    msgContent.push({type:'text',text:userText||'Przeanalizuj plik.'});
+    const history = (conversationHistory[activeClient?.id]||[]).slice(-8).map(m=>({role:m.role==='ai'?'assistant':'user',content:m.text||'(plik)'}));
+    if (history.length && history[history.length-1].role==='user') history[history.length-1].content=msgContent;
+    else history.push({role:'user',content:msgContent});
+    const res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:history})});
+    const data = await res.json();
+    removeTyping();
+    if (data.error) throw new Error(data.error.message);
+    const responseText = data.content?.[0]?.text||'Brak odpowiedzi.';
+    const aiMsg = {role:'ai',html:fmtAI(responseText),text:responseText};
+    if (activeClient) conversationHistory[activeClient.id].push(aiMsg);
+    renderMsg(aiMsg);
+  } catch(e) { removeTyping(); renderMsg({role:'ai',html:`<p>❌ Błąd API: ${escHtml(e.message)}</p>`,text:''}); }
+  setSendDisabled(false);
+}
+
+async function mockAI(text, file) {
+  await new Promise(r=>setTimeout(r,750+Math.random()*500));
+  removeTyping();
+  const isPerson = activeClient && !!activeClient.pesel;
+  let html, responseText;
+  if (file) {
+    responseText = `Wczytałem plik ${file.name}. Aby AI przeanalizował JPK, dodaj klucz API Anthropic klikając "Klucz API" w górnym pasku.`;
+    html = `<p>Wczytałem plik <strong>${file.name}</strong> 📄</p><p>Aby AI przeanalizował JPK, kliknij <strong>"Klucz API"</strong> i wpisz klucz Anthropic.</p><div class="highlight-box"><strong>Co mogę zrobić z JPK?</strong>Wykryć anomalie · Wskazać nowych kontrahentów · Sprawdzić split payment · Podsumować obroty</div>`;
+  } else if (isPerson) {
+    responseText = `Na podstawie profilu klienta ${activeClient.name} (${activeClient.tags.join(', ')}): potrzebuję dokumentów PIT, żeby odpowiedzieć szczegółowo.`;
+    html = `<p>Na podstawie profilu klienta <strong>${activeClient.name}</strong>:</p><ul>${activeClient.tags.map(t=>`<li>${t}</li>`).join('')}</ul><div class="highlight-box"><strong>💡 Wskazówka</strong>Wgraj dokument PIT lub zeznanie, żebym mógł odpowiedzieć szczegółowo.</div>`;
+  } else {
+    responseText = 'To jest tryb demonstracyjny. Aby uruchomić pełne AI, dodaj klucz API Anthropic.';
+    html = `<p>To tryb demonstracyjny — odpowiedzi są przykładowe.</p><p>Aby uruchomić pełne AI:</p><ul><li>Kliknij <strong>"Klucz API"</strong> w górnym pasku</li><li>Wpisz klucz ze strony <strong>console.anthropic.com</strong></li><li>Wgraj plik JPK i pytaj!</li></ul>`;
+  }
+  const aiMsg = {role:'ai',html,text:responseText};
+  if (activeClient) { if (!conversationHistory[activeClient.id]) conversationHistory[activeClient.id]=[]; conversationHistory[activeClient.id].push(aiMsg); }
+  renderMsg(aiMsg);
+  setSendDisabled(false);
+}
+
+function fmtAI(text) {
+  return '<p>' + text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/^- (.+)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>(\n|$))+/g,m=>`<ul>${m}</ul>`).replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>') + '</p>';
+}
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function setSendDisabled(v) { document.getElementById('send-btn').disabled=v; }
+
+// ── INPUT ──
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+function setPrompt(text) { if(!activeClient) return; document.getElementById('chat-input').value=text; document.getElementById('chat-input').focus(); }
+
+// ── FILE ──
+function handleFileSelect(e) {
+  const file=e.target.files[0]; if(!file) return;
+  attachedFile=file;
+  document.getElementById('file-name-display').textContent=file.name;
+  document.getElementById('file-indicator').classList.add('show');
+  document.getElementById('topbar-badge').style.display='inline-flex';
+  const reader=new FileReader(); reader.onload=ev=>{attachedFileContent=ev.target.result;}; reader.readAsText(file);
+  e.target.value='';
+}
+function removeFile() {
+  attachedFile=null; attachedFileContent='';
+  document.getElementById('file-indicator').classList.remove('show');
+  document.getElementById('topbar-badge').style.display='none';
+}
+document.addEventListener('dragover',e=>{e.preventDefault();document.getElementById('drag-overlay').classList.add('active');});
+document.addEventListener('dragleave',e=>{if(!e.relatedTarget)document.getElementById('drag-overlay').classList.remove('active');});
+document.addEventListener('drop',e=>{
+  e.preventDefault(); document.getElementById('drag-overlay').classList.remove('active');
+  const file=e.dataTransfer.files[0]; if(!file) return;
+  attachedFile=file;
+  document.getElementById('file-name-display').textContent=file.name;
+  document.getElementById('file-indicator').classList.add('show');
+  document.getElementById('topbar-badge').style.display='inline-flex';
+  const reader=new FileReader(); reader.onload=ev=>{attachedFileContent=ev.target.result;}; reader.readAsText(file);
+});
+
+// ── EMAIL ──
+function openEmailModal(msgText) {
+  if (!activeClient) { showToast('Najpierw wybierz klienta', false); return; }
+  document.getElementById('email-to-addr').textContent = activeClient.email;
+  document.getElementById('email-subject').value = `Informacja dotycząca Twojego rozliczenia`;
+  const bodyText = msgText ? stripHtml(msgText) + '\n\n---\nZ poważaniem,\nTwoje Biuro Rachunkowe' : `Szanowny/a ${activeClient.name},\n\n\n\n---\nZ poważaniem,\nTwoje Biuro Rachunkowe`;
+  document.getElementById('email-body').value = bodyText;
+  openModal('email-modal');
+}
+
+function sendEmail() {
+  const to = activeClient?.email;
+  const subject = document.getElementById('email-subject').value.trim();
+  const body = document.getElementById('email-body').value;
+  if (!to || !subject) { showToast('Uzupełnij temat wiadomości', false); return; }
+  // TODO: zastąpić Gmail API
+  window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  closeModal('email-modal');
+  showToast('✉️ Otwieranie klienta email...', true);
+}
+
+function stripHtml(html) { const d=document.createElement('div'); d.innerHTML=html; return d.textContent||d.innerText||''; }
+
+// ── API ──
+function openApiModal() { document.getElementById('api-key-input').value=apiKey; openModal('api-modal'); }
+function saveApiKey() {
+  apiKey=document.getElementById('api-key-input').value.trim();
+  if(apiKey) localStorage.setItem('ksapikey',apiKey); else localStorage.removeItem('ksapikey');
+  updateApiBtn(); closeModal('api-modal');
+  showToast(apiKey?'✅ AI aktywne!':'Klucz usunięty', !!apiKey);
+}
+function updateApiBtn() {
+  const btn=document.getElementById('api-toggle-btn');
+  btn.classList.toggle('active',!!apiKey);
+  document.getElementById('api-btn-label').textContent=apiKey?'AI aktywne':'Klucz API';
+}
+
+// ── MODALS ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeBg(e,id) { if(e.target===document.getElementById(id)) closeModal(id); }
+
+// ── TOAST ──
+function showToast(msg, success=true) {
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast'+(success?' success':'')+' show';
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
