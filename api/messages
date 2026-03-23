@@ -1,8 +1,5 @@
 // api/messages.js — Vercel Serverless Function
-// Klucz API ustaw w Vercel Dashboard → Settings → Environment Variables
-// Nazwa zmiennej: ANTHROPIC_API_KEY
-
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -17,7 +14,7 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: { message: 'Brak klucza ANTHROPIC_API_KEY w zmiennych środowiskowych Vercel' } });
+    return res.status(500).json({ error: { message: 'Brak ANTHROPIC_API_KEY w Vercel Environment Variables' } });
   }
 
   try {
@@ -36,4 +33,4 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(500).json({ error: { message: err.message } });
   }
-}
+};
