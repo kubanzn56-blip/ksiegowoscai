@@ -954,7 +954,7 @@ async function callClaudeAI(userText, file, fileContent) {
     const tools = [{ type: 'web_search_20250305', name: 'web_search' }];
     updateTypingLabel('Szukam aktualnych przepisów...');
 
-    const res = await fetch('http://localhost:3000/v1/messages', {
+    const res = await fetch('/api/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
