@@ -1135,7 +1135,7 @@ function updateApiBtn() {
   const hasKey = !!activeKey();
   btn.classList.toggle('active', hasKey);
   document.getElementById('api-btn-label').textContent = hasKey
-    ? (aiProvider==='gemini' ? 'Gemini aktywny' : 'Claude aktywny')
+    ? (aiProvider==='gemini' ? '' : '')
     : 'Klucz API';
 }
 
