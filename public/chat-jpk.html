@@ -237,6 +237,26 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
 .toast { position: fixed; bottom: 24px; right: 24px; background: var(--black); color: white; padding: 12px 20px; border-radius: 12px; font-size: 13px; font-weight: 500; opacity: 0; transform: translateY(10px); transition: all 0.25s; z-index: 200; pointer-events: none; }
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.success { background: var(--accent); }
+
+/* INBOUND EMAIL */
+.msg-inbound { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 18px; border-bottom-left-radius: 6px; padding: 12px 16px; max-width: 80%; font-size: 14px; line-height: 1.6; }
+.msg-inbound-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.msg-inbound-from { font-weight: 600; color: #1d4ed8; font-size: 13px; }
+.msg-inbound-subject { font-size: 12px; color: #3b82f6; background: #dbeafe; padding: 2px 8px; border-radius: 100px; }
+.msg-inbound-body { color: var(--dark); white-space: pre-wrap; font-size: 13px; max-height: 150px; overflow-y: auto; }
+.msg-draft { background: #fefce8; border: 1px solid #fef08a; border-radius: 12px; padding: 12px 14px; margin-top: 10px; font-size: 13px; }
+.msg-draft-label { font-size: 11px; font-weight: 600; color: #a16207; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.msg-draft-text { color: var(--dark); white-space: pre-wrap; line-height: 1.6; }
+.msg-draft-actions { display: flex; gap: 8px; margin-top: 10px; }
+.btn-approve { flex: 1; padding: 8px; border: none; border-radius: 8px; background: var(--accent); color: white; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+.btn-approve:hover { background: #15803d; }
+.btn-edit { flex: 1; padding: 8px; border: 1.5px solid var(--gray3); border-radius: 8px; background: transparent; color: var(--gray); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.btn-edit:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
+.btn-discard { padding: 8px 12px; border: none; border-radius: 8px; background: #fef2f2; color: #dc2626; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.inbox-badge { position: absolute; top: -4px; right: -4px; width: 16px; height: 16px; background: #2563eb; border-radius: 50%; font-size: 10px; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; }
+.topbar-inbox-btn { position: relative; display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 10px; border: 1px solid var(--gray3); background: transparent; cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--gray); font-weight: 500; transition: all 0.15s; }
+.topbar-inbox-btn:hover { background: #eff6ff; border-color: #bfdbfe; color: #2563eb; }
+.topbar-inbox-btn.has-new { border-color: #bfdbfe; color: #2563eb; background: #eff6ff; }
 </style>
 </head>
 <body>
@@ -250,6 +270,10 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
     <div class="topbar-client-name" id="topbar-client-name">Wybierz klienta</div>
     <div class="topbar-badge" id="topbar-badge">JPK wgrany</div>
     <div class="topbar-actions">
+      <button class="topbar-inbox-btn" id="inbox-btn" onclick="showInbox()">
+        📬 Skrzynka
+        <span class="inbox-badge" id="inbox-badge" style="display:none">0</span>
+      </button>
       <button class="email-topbar-btn" id="email-topbar-btn" onclick="openEmailModal(null)">✉️ Email do klienta</button>
     </div>
   </div>
@@ -1180,7 +1204,179 @@ async function sendEmail() {
 }
 function stripHtml(html) { const d=document.createElement('div'); d.innerHTML=html; return d.textContent||d.innerText||''; }
 
-// ── MODALS ──
+// ── INBOUND EMAILS ──
+let inboundEmails = [];
+let pollingInterval = null;
+
+function startPolling() {
+  fetchInboundEmails();
+  pollingInterval = setInterval(fetchInboundEmails, 10000); // co 10 sekund
+}
+
+async function fetchInboundEmails() {
+  try {
+    const res = await fetch('/api/get-emails');
+    if (!res.ok) return;
+    const data = await res.json();
+    const newEmails = (data.emails || []).filter(e => !e.read);
+
+    // Sprawdź czy są nowe maile
+    const prevIds = new Set(inboundEmails.map(e => e.id));
+    const brandNew = newEmails.filter(e => !prevIds.has(e.id));
+
+    inboundEmails = newEmails;
+    updateInboxBadge(newEmails.length);
+
+    // Pokaż nowe maile w czacie aktywnego klienta jeśli pasuje email
+    if (brandNew.length > 0 && activeClient) {
+      brandNew.forEach(email => {
+        if (email.from.toLowerCase().includes(activeClient.email.toLowerCase()) ||
+            activeClient.email.toLowerCase().includes(email.from.toLowerCase().replace(/.*<|>.*/g, ''))) {
+          showInboundEmailInChat(email);
+        }
+      });
+      showToast(`📬 Nowy mail od klienta!`, true);
+    }
+  } catch(e) {
+    // cicho — polling nie blokuje UI
+  }
+}
+
+function updateInboxBadge(count) {
+  const badge = document.getElementById('inbox-badge');
+  const btn = document.getElementById('inbox-btn');
+  if (count > 0) {
+    badge.style.display = 'flex';
+    badge.textContent = count > 9 ? '9+' : count;
+    btn.classList.add('has-new');
+  } else {
+    badge.style.display = 'none';
+    btn.classList.remove('has-new');
+  }
+}
+
+function showInbox() {
+  const area = document.getElementById('chat-area');
+  const w = document.getElementById('chat-welcome');
+  if (w) w.remove();
+
+  if (inboundEmails.length === 0) {
+    showToast('Brak nowych wiadomości', true);
+    return;
+  }
+
+  inboundEmails.forEach(email => showInboundEmailInChat(email));
+}
+
+function showInboundEmailInChat(email) {
+  const area = document.getElementById('chat-area');
+  const w = document.getElementById('chat-welcome');
+  if (w) w.remove();
+
+  // Nie pokazuj ponownie jeśli już jest w czacie
+  if (document.getElementById(`email-${email.id}`)) return;
+
+  const div = document.createElement('div');
+  div.className = 'msg-group ai';
+  div.id = `email-${email.id}`;
+  div.innerHTML = `
+    <div class="msg-label"><div class="ai-icon" style="background:#2563eb">✉</div> Wiadomość od klienta · ${new Date(email.receivedAt).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}</div>
+    <div class="msg-inbound">
+      <div class="msg-inbound-header">
+        <span class="msg-inbound-from">Od: ${escHtml(email.from)}</span>
+        <span class="msg-inbound-subject">${escHtml(email.subject)}</span>
+      </div>
+      <div class="msg-inbound-body">${escHtml(email.body)}</div>
+      <div id="draft-area-${email.id}" style="margin-top:10px">
+        <button onclick="generateDraft('${email.id}')" style="padding:7px 16px;border-radius:8px;border:1.5px solid #bfdbfe;background:#eff6ff;color:#2563eb;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">
+          🤖 Generuj odpowiedź AI
+        </button>
+      </div>
+    </div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+
+  // Oznacz jako przeczytany
+  fetch('/api/mark-read', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: email.id })
+  });
+}
+
+async function generateDraft(emailId) {
+  const email = inboundEmails.find(e => e.id === emailId);
+  if (!email) return;
+
+  const draftArea = document.getElementById(`draft-area-${emailId}`);
+  draftArea.innerHTML = `<div style="font-size:12px;color:var(--gray2);padding:8px 0">🤖 AI generuje odpowiedź...</div>`;
+
+  try {
+    const clientCtx = activeClient
+      ? `Klient: ${activeClient.name}, ${activeClient.type || activeClient.zawod || ''}, ${activeClient.tags.join(', ')}`
+      : '';
+
+    const res = await fetch('/api/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1000,
+        system: `Jesteś asystentem biura rachunkowego. Napisz profesjonalną, krótką odpowiedź na email klienta po polsku. Zakończ: "Z poważaniem,\nBiuro Rachunkowe". ${clientCtx}`,
+        messages: [{
+          role: 'user',
+          content: `Email od klienta:\nTemat: ${email.subject}\n\nTreść:\n${email.body}\n\nNapisz odpowiedź.`
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const draft = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('') || '';
+
+    draftArea.innerHTML = `
+      <div class="msg-draft">
+        <div class="msg-draft-label">✏️ Proponowana odpowiedź AI</div>
+        <textarea id="draft-text-${emailId}" style="width:100%;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;color:var(--dark);resize:vertical;min-height:80px;outline:none">${draft}</textarea>
+        <div class="msg-draft-actions">
+          <button class="btn-approve" onclick="approveDraft('${emailId}', '${escHtml(email.from)}', '${escHtml(email.subject)}')">✅ Wyślij</button>
+          <button class="btn-edit" onclick="document.getElementById('draft-text-${emailId}').focus()">✏️ Edytuj</button>
+          <button class="btn-discard" onclick="document.getElementById('draft-area-${emailId}').innerHTML=''">✕</button>
+        </div>
+      </div>`;
+  } catch(e) {
+    draftArea.innerHTML = `<div style="color:#dc2626;font-size:12px">Błąd generowania: ${e.message}</div>`;
+  }
+}
+
+async function approveDraft(emailId, to, subject) {
+  const draftText = document.getElementById(`draft-text-${emailId}`)?.value;
+  if (!draftText) return;
+
+  const replySubject = subject.startsWith('Re:') ? subject : `Re: ${subject}`;
+  const htmlContent = `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#18181b;max-width:600px;margin:0 auto;padding:24px">${draftText.replace(/\n/g,'<br>')}</div>`;
+
+  try {
+    const res = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to, subject: replySubject, htmlContent, textContent: draftText })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById(`draft-area-${emailId}`).innerHTML = `<div style="color:var(--accent);font-size:12px;font-weight:600;padding:6px 0">✅ Odpowiedź wysłana do ${to}</div>`;
+      showToast('✅ Odpowiedź wysłana!', true);
+    } else {
+      throw new Error(data.error);
+    }
+  } catch(e) {
+    showToast(`❌ Błąd: ${e.message}`, false);
+  }
+}
+
+// Uruchom polling od razu
+startPolling();
+
+
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function closeBg(e,id) { if(e.target===document.getElementById(id)) closeModal(id); }
