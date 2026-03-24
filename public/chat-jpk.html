@@ -501,7 +501,7 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
 <div class="modal-overlay" id="email-modal" onclick="closeBg(event,'email-modal')">
   <div class="modal">
     <h3>✉️ Wyślij email do klienta</h3>
-    <p>Możesz edytować treść przed wysłaniem. Wiadomość trafi na adres email klienta.</p>
+    <p>Wiadomość zostanie wysłana bezpośrednio na adres email klienta.</p>
     <label>Odbiorca</label>
     <div class="email-to-row">
       <span class="to-label">Do:</span>
@@ -511,10 +511,10 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
     <input type="text" id="email-subject" placeholder="Temat wiadomości..." />
     <label>Treść wiadomości</label>
     <textarea id="email-body" rows="6" placeholder="Treść..."></textarea>
-    <div class="gmail-note">📬 Teraz otwiera domyślnego klienta email (mailto:). Wysyłka przez Gmail API — wkrótce!</div>
+    <div id="email-status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:500"></div>
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeModal('email-modal')">Anuluj</button>
-      <button class="btn-modal-email" onclick="sendEmail()">✉️ Wyślij email</button>
+      <button class="btn-modal-email" id="email-send-btn" onclick="sendEmail()">✉️ Wyślij email</button>
     </div>
   </div>
 </div>
@@ -1093,14 +1093,59 @@ function openEmailModal(msgText) {
   document.getElementById('email-body').value = bodyText;
   openModal('email-modal');
 }
-function sendEmail() {
+async function sendEmail() {
   const to = activeClient?.email;
+  const toName = activeClient?.name;
   const subject = document.getElementById('email-subject').value.trim();
-  const body = document.getElementById('email-body').value;
-  if (!to || !subject) { showToast('Uzupełnij temat wiadomości', false); return; }
-  window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  closeModal('email-modal');
-  showToast('✉️ Otwieranie klienta email...', true);
+  const bodyText = document.getElementById('email-body').value.trim();
+  const statusEl = document.getElementById('email-status');
+  const btn = document.getElementById('email-send-btn');
+
+  if (!to || !subject || !bodyText) {
+    showToast('Uzupełnij temat i treść wiadomości', false);
+    return;
+  }
+
+  // Konwersja tekstu na HTML (zachowaj nowe linie)
+  const htmlContent = `
+    <div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#18181b;max-width:600px;margin:0 auto;padding:24px">
+      ${bodyText.replace(/\n/g, '<br>')}
+    </div>`;
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Wysyłanie...';
+  statusEl.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to, toName, subject, htmlContent, textContent: bodyText })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      statusEl.style.display = 'block';
+      statusEl.style.background = '#f0fdf4';
+      statusEl.style.border = '1px solid #bbf7d0';
+      statusEl.style.color = '#16a34a';
+      statusEl.textContent = `✅ Email wysłany do ${to}`;
+      btn.textContent = '✓ Wysłano';
+      showToast(`✅ Email wysłany do ${activeClient.name}`, true);
+      setTimeout(() => closeModal('email-modal'), 1800);
+    } else {
+      throw new Error(data.error || 'Nieznany błąd');
+    }
+  } catch(err) {
+    statusEl.style.display = 'block';
+    statusEl.style.background = '#fef2f2';
+    statusEl.style.border = '1px solid #fecaca';
+    statusEl.style.color = '#dc2626';
+    statusEl.textContent = `❌ Błąd: ${err.message}`;
+    btn.disabled = false;
+    btn.textContent = '✉️ Wyślij email';
+  }
 }
 function stripHtml(html) { const d=document.createElement('div'); d.innerHTML=html; return d.textContent||d.innerText||''; }
 
