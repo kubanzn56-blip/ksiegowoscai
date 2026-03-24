@@ -953,7 +953,7 @@ async function callGeminiAI(userText, file, fileContent) {
 }
 
 // ── CLAUDE AI ──   ✅ POPRAWIONO: apiKeyAnthropic, model haiku-4-5, usunięto beta header
-async function callClaudeAI(userText, file, fileContent) {
+async function callClaudeAI(userText, file, fileContent, fileType = 'text') {
   try {
     const c = activeClient;
     const isPerson = c && !!c.pesel;
@@ -966,20 +966,18 @@ async function callClaudeAI(userText, file, fileContent) {
     const sys = SYSTEM_PROMPT + clientContext;
     const msgContent = [];
     if (fileContent) {
-      if (attachedFileType === 'pdf') {
-        // PDF — wysyłamy jako dokument base64, Claude czyta natywnie
+      if (fileType === 'pdf') {
         msgContent.push({
           type: 'document',
           source: { type: 'base64', media_type: 'application/pdf', data: fileContent }
         });
         msgContent.push({ type: 'text', text: userText || 'Przeanalizuj wgrany dokument PDF.' });
       } else {
-        // Plik tekstowy (XML, CSV, itp.)
         msgContent.push({ type: 'text', text: `Wgrany plik: ${file?.name}\n\nZawartość pliku (pierwsze 12 000 znaków):\n\n${fileContent.slice(0, 12000)}` });
         msgContent.push({ type: 'text', text: userText || 'Przeanalizuj wgrany plik.' });
       }
     } else {
-      msgContent.push({ type: 'text', text: userText || 'Przeanalizuj wgrany plik.' });
+      msgContent.push({ type: 'text', text: userText || '' });
     }
     const rawHistory = (conversationHistory[activeClient?.id] || []).slice(-10);
     const messages = [];
@@ -994,12 +992,10 @@ async function callClaudeAI(userText, file, fileContent) {
     const res = await fetch('/api/messages', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKeyAnthropic,          // ✅ POPRAWKA 1: była tu błędna zmienna 'apiKey'
-        'anthropic-version': '2023-06-01'       // ✅ POPRAWKA 3: usunięto 'anthropic-beta'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',     // ✅ POPRAWKA 2: był hardcoded Sonnet
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 4000,
         system: sys,
         tools,
@@ -1037,14 +1033,11 @@ async function sendMessage() {
   if (activeClient) { if (!conversationHistory[activeClient.id]) conversationHistory[activeClient.id]=[]; conversationHistory[activeClient.id].push(userMsg); }
   renderMsg(userMsg);
   input.value=''; autoResize(input);
-  const fileRef=attachedFile, fileContent=attachedFileContent;
+  const fileRef = attachedFile;
+  const fileContent = attachedFileContent;
+  const fileType = attachedFileType;
   removeFile(); showTyping(); setSendDisabled(true);
-  if (activeKey()) {
-    if (aiProvider === 'gemini') await callGeminiAI(text, fileRef, fileContent);
-    else await callClaudeAI(text, fileRef, fileContent);
-  } else {
-    await mockAI(text, fileRef);
-  }
+  await callClaudeAI(text, fileRef, fileContent, fileType);
 }
 
 async function mockAI(text, file) {
