@@ -251,10 +251,6 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
     <div class="topbar-badge" id="topbar-badge">JPK wgrany</div>
     <div class="topbar-actions">
       <button class="email-topbar-btn" id="email-topbar-btn" onclick="openEmailModal(null)">✉️ Email do klienta</button>
-      <button class="api-btn" id="api-toggle-btn" onclick="openApiModal()">
-        <div class="api-dot"></div>
-        <span id="api-btn-label">Klucz API</span>
-      </button>
     </div>
   </div>
 </div>
@@ -501,42 +497,6 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
   </div>
 </div>
 
-<!-- API MODAL -->
-<div class="modal-overlay" id="api-modal" onclick="closeBg(event,'api-modal')">
-  <div class="modal" style="width:500px">
-    <h3>🔑 Ustawienia AI</h3>
-    <p>Wybierz dostawcę AI i wpisz swój klucz API. Klucze przechowywane są wyłącznie lokalnie w przeglądarce.</p>
-    <label style="margin-top:0">Dostawca AI</label>
-    <div style="display:flex;gap:10px;margin-top:4px">
-      <div class="provider-card" id="prov-anthropic" onclick="selectProvider('anthropic')">
-        <div class="provider-logo">✦</div>
-        <div class="provider-name">Claude Haiku 4.5</div>
-        <div class="provider-sub">Anthropic · szybki i wydajny</div>
-      </div>
-      <div class="provider-card" id="prov-gemini" onclick="selectProvider('gemini')">
-        <div class="provider-logo" style="font-size:18px">✦</div>
-        <div class="provider-name">Gemini 2.5 Flash</div>
-        <div class="provider-sub">Google · szybki i tani</div>
-      </div>
-    </div>
-    <div id="api-section-anthropic">
-      <label>Klucz API Anthropic</label>
-      <input type="password" id="api-key-anthropic" placeholder="sk-ant-api03-..." />
-      <div class="modal-note">Pobierz klucz: <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a></div>
-    </div>
-    <div id="api-section-gemini" style="display:none">
-      <label>Klucz API Google Gemini</label>
-      <input type="password" id="api-key-gemini" placeholder="AIza..." />
-      <div class="modal-note">Pobierz klucz: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent)">aistudio.google.com</a></div>
-    </div>
-    <div class="modal-note" style="margin-top:14px">🔒 Klucze zapisywane wyłącznie w localStorage — nigdy nie opuszczają urządzenia</div>
-    <div class="modal-actions">
-      <button class="btn-modal-cancel" onclick="closeModal('api-modal')">Anuluj</button>
-      <button class="btn-modal-save" onclick="saveApiKey()">Zapisz i włącz AI</button>
-    </div>
-  </div>
-</div>
-
 <!-- EMAIL MODAL -->
 <div class="modal-overlay" id="email-modal" onclick="closeBg(event,'email-modal')">
   <div class="modal">
@@ -563,13 +523,15 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
 <input type="file" id="file-input" accept=".xml,.csv,.xlsx,.pdf,.txt" onchange="handleFileSelect(event)">
 
 <script>
-// ── KONFIGURACJA — wpisz swój klucz tutaj ──
+// ── KONFIGURACJA ──
+// Klucz API ustaw w Vercel: Settings → Environment Variables → ANTHROPIC_API_KEY
+// Nie wpisuj klucza tutaj — jest bezpiecznie przekazywany przez /api/messages
 const CONFIG = {
-  ANTHROPIC_KEY: 'sk-ant-WPISZ-TUTAJ-SWOJ-KLUCZ',  // ← wpisz klucz Anthropic
-  GEMINI_KEY:    '',                                   // ← opcjonalnie klucz Gemini
-  DEFAULT_PROVIDER: 'anthropic'                        // 'anthropic' lub 'gemini'
+  ANTHROPIC_KEY: '',   // zostaw puste — klucz jest w Vercel env vars
+  GEMINI_KEY:    '',   // opcjonalnie klucz Gemini (wpisz tutaj lub dodaj zmienną)
+  DEFAULT_PROVIDER: 'anthropic'
 };
-// ────────────────────────────────────────────
+// ──────────────────────────────────────────
 
 // ── DATA ──
 const FIRMY = [
@@ -606,9 +568,7 @@ let nextId = 200;
 document.getElementById('count-firmy').textContent = FIRMY.length;
 document.getElementById('count-osoby').textContent = OSOBY.length;
 renderClientList(FIRMY);
-updateApiBtn();
 initColorSwatches();
-selectProvider(aiProvider);
 
 function initColorSwatches() {
   ['firma','osoba'].forEach(group => {
@@ -685,14 +645,55 @@ function selectClient(id) {
   const area = document.getElementById('chat-area');
   if (!conversationHistory[id]) {
     conversationHistory[id] = [];
+    area.innerHTML = '';
+
+    // Automatyczna wiadomość z danymi klienta
+    const statsHtml = activeClient.stats.map(s =>
+      `<li><strong>${s.label}:</strong> ${s.val}</li>`
+    ).join('');
+    const tagsHtml = activeClient.tags.map(t =>
+      `<span style="display:inline-block;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);border-radius:100px;padding:1px 10px;font-size:12px;font-weight:500;margin:2px">${t}</span>`
+    ).join(' ');
+
+    const detailsHtml = isPerson
+      ? `<li><strong>PESEL:</strong> ${activeClient.pesel.slice(0,6)}·····</li>
+         <li><strong>Zawód:</strong> ${activeClient.zawod}</li>
+         <li><strong>Email:</strong> ${activeClient.email}</li>
+         <li><strong>Klient od:</strong> ${activeClient.since}</li>`
+      : `<li><strong>NIP:</strong> ${activeClient.nip}</li>
+         <li><strong>Forma prawna:</strong> ${activeClient.type}</li>
+         <li><strong>PKD:</strong> ${activeClient.pkd||'—'}</li>
+         <li><strong>Email:</strong> ${activeClient.email}</li>
+         <li><strong>Klient od:</strong> ${activeClient.since}</li>`;
+
     const qp = isPerson
       ? `<div class="quick-prompt" onclick="setPrompt(this.innerText)">Jakie ulgi przysługują?</div><div class="quick-prompt" onclick="setPrompt(this.innerText)">Ile zwrotu może dostać?</div><div class="quick-prompt" onclick="setPrompt(this.innerText)">Przygotuj podsumowanie PIT</div>`
       : `<div class="quick-prompt" onclick="setPrompt(this.innerText)">Czy są tu anomalie?</div><div class="quick-prompt" onclick="setPrompt(this.innerText)">Podsumuj obroty miesiąca</div><div class="quick-prompt" onclick="setPrompt(this.innerText)">Sprawdź split payment</div>`;
-    area.innerHTML = `<div class="chat-welcome" id="chat-welcome">
-      <div class="welcome-icon" style="background:${activeClient.color}18;border-color:${activeClient.color}40;border-radius:${isPerson?'50%':'20px'}">${activeClient.initials}</div>
-      <div class="welcome-title">Chat — ${activeClient.name}</div>
-      <div class="welcome-sub">Wgraj ${isPerson?'plik PIT':'plik JPK'} tego klienta i zacznij pytać AI po polsku.</div>
-      <div class="quick-prompts">${qp}</div></div>`;
+
+    const welcomeHtml = `
+      <div class="msg-group ai">
+        <div class="msg-label"><div class="ai-icon">🤖</div> Księgowy.ai</div>
+        <div class="msg-bubble">
+          <p>Wczytałem dane klienta <strong>${activeClient.name}</strong>. Oto co wiem:</p>
+          <ul style="margin:8px 0;padding-left:18px">
+            ${detailsHtml}
+            ${statsHtml}
+          </ul>
+          <div style="margin-top:10px">${tagsHtml}</div>
+          <div class="highlight-box" style="margin-top:12px">
+            <strong>Możesz zapytać m.in.</strong>
+            <div class="quick-prompts" style="margin-top:8px;justify-content:flex-start">${qp}</div>
+          </div>
+        </div>
+      </div>`;
+    area.innerHTML = welcomeHtml;
+
+    // Dodaj do historii żeby AI miało kontekst
+    conversationHistory[id].push({
+      role: 'ai',
+      html: welcomeHtml,
+      text: `Dane klienta ${activeClient.name} zostały wczytane.`
+    });
   } else {
     area.innerHTML = '';
     conversationHistory[id].forEach(m => renderMsg(m, false));
@@ -1102,42 +1103,6 @@ function sendEmail() {
   showToast('✉️ Otwieranie klienta email...', true);
 }
 function stripHtml(html) { const d=document.createElement('div'); d.innerHTML=html; return d.textContent||d.innerText||''; }
-
-// ── API ──
-function selectProvider(p) {
-  aiProvider = p;
-  document.getElementById('prov-anthropic').classList.toggle('selected', p==='anthropic');
-  document.getElementById('prov-gemini').classList.toggle('selected', p==='gemini');
-  document.getElementById('api-section-anthropic').style.display = p==='anthropic' ? '' : 'none';
-  document.getElementById('api-section-gemini').style.display = p==='gemini' ? '' : 'none';
-}
-function openApiModal() {
-  document.getElementById('api-key-anthropic').value = apiKeyAnthropic;
-  document.getElementById('api-key-gemini').value = apiKeyGemini;
-  selectProvider(aiProvider);
-  openModal('api-modal');
-}
-function saveApiKey() {
-  const antKey = document.getElementById('api-key-anthropic').value.trim();
-  const gemKey = document.getElementById('api-key-gemini').value.trim();
-  aiProvider = document.getElementById('prov-anthropic').classList.contains('selected') ? 'anthropic' : 'gemini';
-  apiKeyAnthropic = antKey;
-  apiKeyGemini    = gemKey;
-  localStorage.setItem('ks-provider', aiProvider);
-  if (antKey) localStorage.setItem('ks-key-anthropic', antKey); else localStorage.removeItem('ks-key-anthropic');
-  if (gemKey) localStorage.setItem('ks-key-gemini', gemKey);    else localStorage.removeItem('ks-key-gemini');
-  updateApiBtn();
-  closeModal('api-modal');
-  showToast(activeKey() ? `✅ ${aiProvider==='gemini'?'Gemini':'Claude'} aktywny!` : 'Klucze zapisane', !!activeKey());
-}
-function updateApiBtn() {
-  const btn = document.getElementById('api-toggle-btn');
-  const hasKey = !!activeKey();
-  btn.classList.toggle('active', hasKey);
-  document.getElementById('api-btn-label').textContent = hasKey
-    ? (aiProvider==='gemini' ? '' : '')
-    : 'Klucz API';
-}
 
 // ── MODALS ──
 function openModal(id) { document.getElementById(id).classList.add('open'); }
