@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Księgowy.ai — AI asystent dla biur rachunkowych</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Lora:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -122,7 +122,6 @@
     background: var(--border);
   }
 
-  /* decorative dots */
   .hero-dots {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -161,12 +160,13 @@
     50% { opacity: 0.5; transform: scale(1.4); }
   }
 
+  /* ✅ ZMIANA: h1 używa Lora zamiast Syne — cieplejsza, elegancka, czytelna */
   h1 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: clamp(40px, 7vw, 80px);
-    line-height: 1.0;
-    letter-spacing: -2.5px;
+    font-family: 'Lora', Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(38px, 6.5vw, 74px);
+    line-height: 1.08;
+    letter-spacing: -1px;
     margin-bottom: 28px;
     animation: fadeUp 0.6s 0.1s ease both;
     color: var(--black);
@@ -174,7 +174,7 @@
   }
 
   h1 em {
-    font-style: normal;
+    font-style: italic;
     color: var(--accent);
   }
 
@@ -287,11 +287,11 @@
   }
 
   h2 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: clamp(30px, 4vw, 48px);
-    letter-spacing: -1px;
-    line-height: 1.1;
+    font-family: 'Lora', Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(28px, 3.5vw, 44px);
+    letter-spacing: -0.5px;
+    line-height: 1.15;
     margin-bottom: 20px;
     color: var(--black);
   }
@@ -352,11 +352,11 @@
   }
 
   .feature-card h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 19px;
-    font-weight: 700;
+    font-family: 'Lora', Georgia, serif;
+    font-size: 18px;
+    font-weight: 600;
     margin-bottom: 12px;
-    line-height: 1.2;
+    line-height: 1.25;
     color: var(--black);
   }
 
@@ -376,6 +376,47 @@
     font-size: 12px;
     color: var(--accent);
     font-weight: 500;
+  }
+
+  /* ✅ NOWY: CTA pod funkcjami */
+  .features-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 48px;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .btn-demo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 16px 36px;
+    border-radius: 100px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(22,163,74,0.35);
+  }
+
+  .btn-demo:hover {
+    background: #15803d;
+    box-shadow: 0 6px 28px rgba(22,163,74,0.45);
+    transform: translateY(-1px);
+  }
+
+  .btn-demo:active { transform: scale(0.98); }
+
+  .btn-demo-note {
+    font-size: 13px;
+    color: var(--gray2);
   }
 
   /* HOW IT WORKS */
@@ -420,9 +461,9 @@
   }
 
   .step h4 {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Lora', Georgia, serif;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 600;
     margin-bottom: 8px;
     color: var(--black);
   }
@@ -485,9 +526,9 @@
   }
 
   .plan-price {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Lora', Georgia, serif;
     font-size: 52px;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1;
     margin-bottom: 4px;
     color: var(--black);
@@ -574,7 +615,7 @@
   }
 
   .faq-question {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Lora', Georgia, serif;
     font-size: 17px;
     font-weight: 600;
     display: flex;
@@ -665,7 +706,6 @@
   }
 
   footer p { font-size: 13px; color: rgba(255,255,255,0.3); }
-
   footer .logo { color: #fff; }
 
   footer ul {
@@ -683,7 +723,6 @@
 
   footer ul a:hover { color: rgba(255,255,255,0.8); }
 
-  /* ANIMATIONS */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(24px); }
     to { opacity: 1; transform: translateY(0); }
@@ -700,7 +739,6 @@
     transform: translateY(0);
   }
 
-  /* TOAST */
   .toast {
     position: fixed;
     bottom: 32px; right: 32px;
@@ -757,7 +795,7 @@
   <div class="hero-dots"></div>
   <div class="hero-badge">Już wkrótce — dołącz do listy oczekujących</div>
   <h1>AI asystent<br>dla Twojego<br><em>biura rachunkowego</em></h1>
-  <p class="hero-sub">Koniec z ręcznym przeglądaniem JPK, pisaniem komentarzy i gonienie za klientami. Księgowy.ai robi to za Ciebie.</p>
+  <p class="hero-sub">Koniec z ręcznym przeglądaniem JPK, pisaniem komentarzy i gonieniem za klientami. Księgowy.ai robi to za Ciebie.</p>
   <form class="hero-form" onsubmit="handleSubmit(event, this)">
     <input type="email" placeholder="twoj@email.pl" required>
     <button type="submit" class="btn-primary">Dołącz do listy oczekujących →</button>
@@ -831,6 +869,14 @@
       <p>Luty–kwiecień bez stresu. AI pomaga zebrać dokumenty od klientów, sprawdza czy zastosowano wszystkie ulgi i generuje spersonalizowane wyjaśnienie dla każdego klienta — dlaczego płaci tyle a nie mniej.</p>
       <span class="feature-tag">Sezonowy hit</span>
     </div>
+  </div>
+
+  <!-- ✅ NOWY PRZYCISK pod funkcjami -->
+  <div class="features-cta reveal">
+    <a href="chat-jpk.html" class="btn-demo">
+      <span>🚀</span> Wypróbuj demo — Chat z JPK
+    </a>
+    <p class="btn-demo-note">Bez rejestracji · Działa od razu</p>
   </div>
 </section>
 
@@ -991,7 +1037,6 @@
   </ul>
 </footer>
 
-<!-- TOAST -->
 <div class="toast" id="toast">✓ Zapisano na listę oczekujących!</div>
 
 <script>
