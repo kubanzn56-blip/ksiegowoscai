@@ -520,7 +520,7 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
 </div>
 
 <div class="toast" id="toast"></div>
-<input type="file" id="file-input" accept=".xml,.csv,.xlsx,.pdf,.txt" onchange="handleFileSelect(event)">
+<input type="file" id="file-input" accept=".xml,.csv,.xlsx,.pdf,.txt,.jpg,.jpeg,.png" onchange="handleFileSelect(event)">
 
 <script>
 // ── KONFIGURACJA ──
@@ -942,9 +942,21 @@ async function callClaudeAI(userText, file, fileContent) {
     const sys = SYSTEM_PROMPT + clientContext;
     const msgContent = [];
     if (fileContent) {
-      msgContent.push({ type: 'text', text: `Wgrany plik: ${file?.name}\n\nZawartość pliku (pierwsze 12 000 znaków):\n\n${fileContent.slice(0, 12000)}` });
+      if (attachedFileType === 'pdf') {
+        // PDF — wysyłamy jako dokument base64, Claude czyta natywnie
+        msgContent.push({
+          type: 'document',
+          source: { type: 'base64', media_type: 'application/pdf', data: fileContent }
+        });
+        msgContent.push({ type: 'text', text: userText || 'Przeanalizuj wgrany dokument PDF.' });
+      } else {
+        // Plik tekstowy (XML, CSV, itp.)
+        msgContent.push({ type: 'text', text: `Wgrany plik: ${file?.name}\n\nZawartość pliku (pierwsze 12 000 znaków):\n\n${fileContent.slice(0, 12000)}` });
+        msgContent.push({ type: 'text', text: userText || 'Przeanalizuj wgrany plik.' });
+      }
+    } else {
+      msgContent.push({ type: 'text', text: userText || 'Przeanalizuj wgrany plik.' });
     }
-    msgContent.push({ type: 'text', text: userText || 'Przeanalizuj wgrany plik.' });
     const rawHistory = (conversationHistory[activeClient?.id] || []).slice(-10);
     const messages = [];
     for (const m of rawHistory) {
@@ -1058,17 +1070,36 @@ function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.sc
 function setPrompt(text) { if(!activeClient) return; document.getElementById('chat-input').value=text; document.getElementById('chat-input').focus(); }
 
 // ── FILE ──
+let attachedFileType = 'text'; // 'text' lub 'pdf'
+
+function readFile(file, callback) {
+  const isPdf = file.type === 'application/pdf' || file.name.endsWith('.pdf');
+  attachedFileType = isPdf ? 'pdf' : 'text';
+  const reader = new FileReader();
+  if (isPdf) {
+    reader.onload = ev => {
+      // Wyciągnij czysty base64 (bez prefixu "data:application/pdf;base64,")
+      const base64 = ev.target.result.split(',')[1];
+      callback(base64);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    reader.onload = ev => callback(ev.target.result);
+    reader.readAsText(file);
+  }
+}
+
 function handleFileSelect(e) {
-  const file=e.target.files[0]; if(!file) return;
-  attachedFile=file;
-  document.getElementById('file-name-display').textContent=file.name;
+  const file = e.target.files[0]; if (!file) return;
+  attachedFile = file;
+  document.getElementById('file-name-display').textContent = file.name;
   document.getElementById('file-indicator').classList.add('show');
-  document.getElementById('topbar-badge').style.display='inline-flex';
-  const reader=new FileReader(); reader.onload=ev=>{attachedFileContent=ev.target.result;}; reader.readAsText(file);
-  e.target.value='';
+  document.getElementById('topbar-badge').style.display = 'inline-flex';
+  readFile(file, content => { attachedFileContent = content; });
+  e.target.value = '';
 }
 function removeFile() {
-  attachedFile=null; attachedFileContent='';
+  attachedFile=null; attachedFileContent=''; attachedFileType='text';
   document.getElementById('file-indicator').classList.remove('show');
   document.getElementById('topbar-badge').style.display='none';
 }
@@ -1081,7 +1112,7 @@ document.addEventListener('drop',e=>{
   document.getElementById('file-name-display').textContent=file.name;
   document.getElementById('file-indicator').classList.add('show');
   document.getElementById('topbar-badge').style.display='inline-flex';
-  const reader=new FileReader(); reader.onload=ev=>{attachedFileContent=ev.target.result;}; reader.readAsText(file);
+  readFile(file, content => { attachedFileContent = content; });
 });
 
 // ── EMAIL ──
