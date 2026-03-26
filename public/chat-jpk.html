@@ -275,6 +275,9 @@ body { background: var(--bg); color: var(--black); font-family: 'DM Sans', sans-
         <span class="inbox-badge" id="inbox-badge" style="display:none">0</span>
       </button>
       <button class="email-topbar-btn" id="email-topbar-btn" onclick="openEmailModal(null)">✉️ Email do klienta</button>
+      <button id="gmail-btn" onclick="connectGmail()" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;border:1px solid var(--gray3);background:transparent;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--gray);font-weight:500;transition:all 0.15s">
+        <img src="https://www.google.com/favicon.ico" style="width:14px;height:14px"> <span id="gmail-btn-label">Połącz Gmail</span>
+      </button>
     </div>
   </div>
 </div>
@@ -1181,6 +1184,34 @@ async function sendEmail() {
       statusEl.textContent = `✅ Email wysłany do ${to}`;
       btn.textContent = '✓ Wysłano';
       showToast(`✅ Email wysłany do ${activeClient.name}`, true);
+
+      // Dodaj wysłany email do czatu
+      const now = new Date().toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'});
+      const sentHtml = `
+        <div class="msg-label" style="justify-content:flex-end">
+          ✉️ Email wysłany · ${now}
+        </div>
+        <div class="msg-bubble" style="background:#eff6ff;border:1px solid #bfdbfe;color:var(--black);border-bottom-right-radius:6px;border-bottom-left-radius:18px">
+          <div style="font-size:11px;color:#3b82f6;font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">
+            Do: ${escHtml(to)} · ${escHtml(subject)}
+          </div>
+          <div style="font-size:14px;white-space:pre-wrap;line-height:1.6">${escHtml(bodyText)}</div>
+        </div>`;
+      const div = document.createElement('div');
+      div.className = 'msg-group user';
+      div.innerHTML = sentHtml;
+      document.getElementById('chat-area').appendChild(div);
+      document.getElementById('chat-area').scrollTop = 99999;
+
+      // Zapisz do historii konwersacji
+      if (activeClient && conversationHistory[activeClient.id]) {
+        conversationHistory[activeClient.id].push({
+          role: 'user',
+          html: sentHtml,
+          text: `[Email do ${to}]\nTemat: ${subject}\n\n${bodyText}`
+        });
+      }
+
       setTimeout(() => closeModal('email-modal'), 1800);
     } else {
       throw new Error(data.error || 'Nieznany błąd');
@@ -1197,42 +1228,78 @@ async function sendEmail() {
 }
 function stripHtml(html) { const d=document.createElement('div'); d.innerHTML=html; return d.textContent||d.innerText||''; }
 
-// ── INBOUND EMAILS ──
-let inboundEmails = [];
-let pollingInterval = null;
+// ── GMAIL OAUTH ──
+let gmailAccount = localStorage.getItem('gmail_account') || null;
 
-function startPolling() {
-  fetchInboundEmails();
-  pollingInterval = setInterval(fetchInboundEmails, 10000); // co 10 sekund
+function connectGmail() {
+  window.location.href = '/api/auth/login';
 }
 
-async function fetchInboundEmails() {
+function updateGmailBtn() {
+  const btn = document.getElementById('gmail-btn');
+  const label = document.getElementById('gmail-btn-label');
+  if (!btn) return;
+  if (gmailAccount) {
+    label.textContent = gmailAccount.split('@')[0];
+    btn.style.borderColor = '#bbf7d0';
+    btn.style.color = '#16a34a';
+    btn.style.background = '#f0fdf4';
+  }
+}
+
+// Sprawdź czy wróciliśmy z OAuth
+(function checkOAuthReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const gmail = params.get('gmail');
+  const error = params.get('error');
+  if (gmail) {
+    gmailAccount = gmail;
+    localStorage.setItem('gmail_account', gmail);
+    updateGmailBtn();
+    showToast(`✅ Gmail połączony: ${gmail}`, true);
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+  if (error) {
+    showToast('❌ Błąd logowania Gmail', false);
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+})();
+
+updateGmailBtn();
+
+// ── INBOUND EMAILS (Gmail polling) ──
+let inboundEmails = [];
+let seenGmailIds = new Set(JSON.parse(localStorage.getItem('seen_gmail_ids') || '[]'));
+
+function startPolling() {
+  if (gmailAccount) fetchGmailEmails();
+  setInterval(() => { if (gmailAccount) fetchGmailEmails(); }, 15000);
+}
+
+async function fetchGmailEmails() {
   try {
-    const res = await fetch('/api/get-emails');
+    const res = await fetch(`/api/auth/emails?account=${encodeURIComponent(gmailAccount)}`);
     if (!res.ok) return;
     const data = await res.json();
-    const newEmails = (data.emails || []).filter(e => !e.read);
-
-    // Sprawdź czy są nowe maile
-    const prevIds = new Set(inboundEmails.map(e => e.id));
-    const brandNew = newEmails.filter(e => !prevIds.has(e.id));
-
-    inboundEmails = newEmails;
-    updateInboxBadge(newEmails.length);
-
-    // Pokaż nowe maile w czacie aktywnego klienta jeśli pasuje email
-    if (brandNew.length > 0 && activeClient) {
+    const emails = data.emails || [];
+    const brandNew = emails.filter(e => !seenGmailIds.has(e.gmailId));
+    if (brandNew.length > 0) {
       brandNew.forEach(email => {
-        if (email.from.toLowerCase().includes(activeClient.email.toLowerCase()) ||
-            activeClient.email.toLowerCase().includes(email.from.toLowerCase().replace(/.*<|>.*/g, ''))) {
-          showInboundEmailInChat(email);
+        seenGmailIds.add(email.gmailId);
+        inboundEmails.unshift(email);
+        if (activeClient) {
+          const clientEmail = activeClient.email.toLowerCase();
+          const fromEmail = email.from.toLowerCase();
+          if (fromEmail === clientEmail || clientEmail === fromEmail) {
+            showInboundEmailInChat(email);
+          }
         }
       });
-      showToast(`📬 Nowy mail od klienta!`, true);
+      localStorage.setItem('seen_gmail_ids', JSON.stringify([...seenGmailIds].slice(0, 500)));
+      updateInboxBadge(brandNew.length);
+      showToast(`📬 Nowy mail!`, true);
     }
-  } catch(e) {
-    // cicho — polling nie blokuje UI
-  }
+  } catch(e) { /* cicho */ }
 }
 
 function updateInboxBadge(count) {
@@ -1249,17 +1316,12 @@ function updateInboxBadge(count) {
 }
 
 function showInbox() {
-  const area = document.getElementById('chat-area');
-  const w = document.getElementById('chat-welcome');
-  if (w) w.remove();
-
-  if (inboundEmails.length === 0) {
-    showToast('Brak nowych wiadomości', true);
-    return;
-  }
-
+  if (!gmailAccount) { showToast('Najpierw połącz Gmail w górnym pasku', false); return; }
+  if (inboundEmails.length === 0) { showToast('Brak nowych wiadomości', true); return; }
   inboundEmails.forEach(email => showInboundEmailInChat(email));
 }
+
+startPolling();
 
 function showInboundEmailInChat(email) {
   const area = document.getElementById('chat-area');
@@ -1269,14 +1331,16 @@ function showInboundEmailInChat(email) {
   // Nie pokazuj ponownie jeśli już jest w czacie
   if (document.getElementById(`email-${email.id}`)) return;
 
+  const time = new Date(email.receivedAt).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
+
   const div = document.createElement('div');
   div.className = 'msg-group ai';
   div.id = `email-${email.id}`;
   div.innerHTML = `
-    <div class="msg-label"><div class="ai-icon" style="background:#2563eb">✉</div> Wiadomość od klienta · ${new Date(email.receivedAt).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'})}</div>
+    <div class="msg-label"><div class="ai-icon" style="background:#2563eb">✉</div> Wiadomość od klienta · ${time}</div>
     <div class="msg-inbound">
       <div class="msg-inbound-header">
-        <span class="msg-inbound-from">Od: ${escHtml(email.from)}</span>
+        <span class="msg-inbound-from">Od: ${escHtml(email.fromName || email.from)}</span>
         <span class="msg-inbound-subject">${escHtml(email.subject)}</span>
       </div>
       <div class="msg-inbound-body">${escHtml(email.body)}</div>
@@ -1288,6 +1352,16 @@ function showInboundEmailInChat(email) {
     </div>`;
   area.appendChild(div);
   area.scrollTop = area.scrollHeight;
+
+  // ✅ Dodaj mail do historii konwersacji — AI będzie go znało
+  if (activeClient) {
+    if (!conversationHistory[activeClient.id]) conversationHistory[activeClient.id] = [];
+    conversationHistory[activeClient.id].push({
+      role: 'user',
+      html: div.innerHTML,
+      text: `[Wiadomość email od klienta]\nOd: ${email.fromName || email.from} <${email.from}>\nTemat: ${email.subject}\n\n${email.body}`
+    });
+  }
 
   // Oznacz jako przeczytany
   fetch('/api/mark-read', {
