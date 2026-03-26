@@ -1,18 +1,18 @@
 // api/mark-read.js
 
 async function kvGet(key) {
-  const res = await fetch(`${process.env.KV_REST_API_URL}/get/${key}`, {
-    headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}` }
+  const res = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/get/${key}`, {
+    headers: { Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}` }
   });
   const data = await res.json();
   return data.result;
 }
 
 async function kvSet(key, value) {
-  await fetch(`${process.env.KV_REST_API_URL}/set/${key}`, {
+  await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/set/${key}`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
+      Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(value)
